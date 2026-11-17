@@ -4,6 +4,16 @@ All notable changes to this project are listed here. The format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.0-alpha.4] - 2026-11-18
+
+### Added
+
+- The trigger GUID count for one custom session is now in the configuration, step-by-step and AGENTS guides: 11 with one core module and the default settings, 6 without creative, 22 with a compatibility module, and 9 for the New World demo.
+
+### Changed
+
+- This release includes the documentation commit authored by Aveline (AI). There is no gameplay or generator behavior change.
+
 ## [0.1.0-alpha.3] - 2026-11-18
 
 ### Added

@@ -2,7 +2,7 @@
 
 ## Current version
 
-`0.1.0-alpha.3`, tagged `v0.1.0-alpha.3`.
+`0.1.0-alpha.4`, tagged `v0.1.0-alpha.4`.
 
 Alpha means:
 
@@ -33,7 +33,8 @@ Every release gets a Git tag on the release commit:
 v0.1.0-alpha.1
 v0.1.0-alpha.2
 v0.1.0-alpha.3
-v0.1.1-alpha.4
+v0.1.0-alpha.4
+v0.1.1-alpha.5
 v0.2.0-alpha.1
 ```
 
