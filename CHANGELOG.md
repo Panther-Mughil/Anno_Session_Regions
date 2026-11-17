@@ -4,6 +4,19 @@ All notable changes to this project are listed here. The format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.0-alpha.3] - 2026-11-18
+
+### Added
+
+- `docs/step-by-step.md`, a beginner walkthrough with every parameter and every command.
+- A visible roadmap in the README and `docs/roadmap.md`.
+- `CREDITS.md`, and a bold attribution request in `LICENSE` and the README.
+- Aveline (AI) is listed as the AI assistant and commit co-author.
+
+### Changed
+
+- The README was reformatted with tables, bold key terms, and separate Windows and Linux scanner paths.
+
 ## [0.1.0-alpha.2] - 2026-11-18
 
 ### Added

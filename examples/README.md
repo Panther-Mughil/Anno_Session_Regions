@@ -1,5 +1,7 @@
 # Examples
 
+New to the project? Read `docs/step-by-step.md` first.
+
 Each folder has a config that the generator can read. The four region configs are templates. They do not hide anything until you replace the placeholder session GUID with the GUID of your own session asset. The demo is the only runnable example.
 
 | Folder | Region | Hide session | Use |

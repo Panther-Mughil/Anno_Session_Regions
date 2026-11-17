@@ -4,223 +4,272 @@ A session-scoped construction menu gate for Anno 1800, with a mod scanner and a 
 
 [![CI](https://github.com/Panther-Mughil/Anno_Session_Regions/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Panther-Mughil/Anno_Session_Regions/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0--alpha.2-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.0--alpha.3-orange.svg)](CHANGELOG.md)
 
-## What this is
+> **New to the project? Read the [step-by-step setup guide](docs/step-by-step.md) first.** It walks through one region, one config, and one generated mod in plain English.
 
-Anno 1800 builds the construction menu from the region, not from the session. A mod that adds a new session inside an existing region inherits that region's whole build menu. This project hides the host region's tier tabs while the player is in the custom session, then puts the game's normal unlock rules back when the player leaves.
+Anno 1800 builds the construction menu from the **region**, not from the **session**. A custom session inside the New World inherits the New World tier tabs, and the same happens inside the Old World, the Arctic, and Enbesa. This project generates a small mod that hides the host region's tier tabs inside your custom session and restores the game's normal unlock rules everywhere else.
 
-It works for custom sessions based on the New World, the Old World, the Arctic, or Enbesa.
+**Contents:** [Status](#status) · [Roadmap](#roadmap) · [Quick start](#quick-start) · [How it works](#how-it-works) · [Compatibility scanner](#compatibility-scanner) · [Supported regions](#supported-regions) · [Documentation](#documentation) · [Credits](#credits)
 
-The project ships:
+## At a glance
 
-- a generator that writes the gate mod from a small JSON config;
-- item lists for the four host regions, generated from the game's own data;
-- a scanner that finds what installed mods add to the host menu;
-- the Streets Unified companion mod, which the gate requires;
-- this guide and the deeper documents under `docs/`.
+| Item | Details |
+|---|---|
+| **What it is** | A reusable session menu gate, a region preset set, a mod scanner, and a guide. |
+| **Host regions** | New World, Old World, Arctic, Enbesa. |
+| **Status** | **Alpha.** Only the New World has an in-game pass. |
+| **Python** | 3.10 or newer. The tools use only the standard library. |
+| **Companion** | **Streets Unified**, included in `companions/streets_unified`. Required. |
+| **License** | **MIT**, with a request to credit Panther when you publish a mod. |
 
 ## Status
 
-**Alpha, version 0.1.0-alpha.2.**
+**Alpha, version `0.1.0-alpha.3`.**
 
-The gate mechanism has been tested in game for the **New World** in normal and creative saves. The Old World, Arctic, and Enbesa presets are generated from the same vanilla data and pass the local tests, but they have **not been tested in game yet**. The mod scanner is experimental and may miss unusual mod edits.
+The gate mechanism has been tested in game for the **New World** in normal and creative saves. The Old World, Arctic, and Enbesa presets are generated from the same vanilla data and pass the local tests, but they **have not been tested in game yet**. The compatibility scanner is **experimental**.
 
 | Host region | Preset | Locked items after streets | In-game test |
 |---|---|---|---|
-| New World | `new_world` | 110 | Yes |
-| Old World | `old_world` | 148 | Not yet |
-| Arctic | `arctic` | 35 | Not yet |
-| Enbesa | `enbesa` | 63 | Not yet |
+| New World | `new_world` | 110 | **Yes** |
+| Old World | `old_world` | 148 | **Not yet** |
+| Arctic | `arctic` | 35 | **Not yet** |
+| Enbesa | `enbesa` | 63 | **Not yet** |
 
-If you test one of the three untested regions, please open an issue with the result. That is how the support table will grow.
+*A report from any of the three untested regions moves it from beta to tested. Open an issue with the result.*
 
-## What the gate does and does not do
+## Roadmap
 
-It does:
+| Status | Item |
+|---|---|
+| **Planned** | Suppress notification toasts when unlocking items. |
+| **Planned** | Find better ways to merge streets back into the building tabs. |
+| **Planned** | Add compatibility discovery with more mods. |
+| **In progress** | Compatibility with other modded sessions. |
 
-- hide the host region's tier tabs inside one session;
-- restore the game's own progression rules in every other session;
-- keep streets available in every session through Streets Unified;
-- generate a separate module for mod-added items, so each group can be updated alone.
+The details and the done criteria are in [docs/roadmap.md](docs/roadmap.md).
 
-It does not:
+## What it does
 
-- create the custom session, map, or population;
-- hide the host region's non-tier tabs, such as harbor or ornaments;
-- change population needs, products, or buildings;
-- restore menus by copying a snapshot of what was unlocked. That reports the game's defaults and over-unlocks saves.
+- Hides the host region's **tier tabs** inside one custom session.
+- Restores the game's **own progression rules** in every other session.
+- Keeps **streets available** through the Streets Unified companion.
+- Generates a separate **compatibility module** for mod-added items.
+- Can **skip the trigger XML** and write a manual trigger manifest instead.
+- Records the **trigger range and config hash** in the generated output.
+
+## What it does not do
+
+- It does not create the session, map, or population.
+- It does not hide the host region's non-tier tabs, such as harbor or ornaments.
+- It does not change products, needs, or buildings.
+- It does not restore menus from a snapshot. That over-unlocks saves.
+- It does not read `mod-loader.log`.
+- It cannot test the result in game for you.
 
 ## Requirements
 
-- Anno 1800 with the in-game mod loader (GU17 or newer). The shipped presets were generated from game version GU18.4.
-- Python 3.10 or newer. The tools use only the standard library, so there is nothing to install to run them.
-- The Streets Unified companion, included in `companions/streets_unified`. The gate declares it as a dependency.
-- A custom session of your own, already defined by your mod. The gate needs its session GUID.
-
-Python packages are only needed for development. Run `pip install -r requirements-dev.txt` to get pytest.
+- Anno 1800 with the in-game mod loader. The shipped presets were made from **GU18.4**.
+- **Python 3.10 or newer**.
+- A custom session mod of your own, with a session GUID.
+- The **Streets Unified** companion.
+- A free block of GUIDs in your mod's own range.
+- Your game install path.
 
 ## Quick start
 
-1. Copy the one region config that matches your host region from `examples/` into your mod project. You do not need the other three. This walkthrough uses `examples/new_world/config.json`.
-2. Open the config and set these fields:
-   - `hide_session.guid`: the GUID of your custom session.
-   - `hide_session.name`: a readable name, used in trigger names.
-   - `mod_id`, `mod_name`, `creator`, and `version`: your mod's values.
-   - `trigger_guid_base`: the first of eleven GUIDs the gate will define. Use a free block in your own range. The example configs leave it empty on purpose; the generator stops until you fill it or pass `--guid-base`.
-   - `script_prefix`: a short prefix for the generated Lua files.
-3. Run the generator:
+1. **Pick one region config** from `examples/`. *You do not need the other three.* This walkthrough uses `examples/new_world/config.json`.
+2. **Fill `hide_session.guid` and `trigger_guid_base`.** The examples leave the trigger base empty on purpose. The generator stops until you fill it. Use a free block in your own range.
+3. **Generate the gate.**
 
    ```sh
-   python src/generate.py --config path/to/your/config.json
+   python3 src/generate.py --config path/to/your/config.json
    ```
 
-   The output goes to the config's folder under `out/<mod_id>` unless you pass `--out`.
-4. Copy the generated folder and `companions/streets_unified` into the game's mods folder.
-5. Start the game and enter your custom session. The host region's tier tabs should be gone. Leave the session and the normal menu should return with the progress you actually earned.
-6. If you use other mods, run the scanner and generate again with the compatibility list. See [Compatibility](#compatibility).
-7. If you want to add the trigger XML yourself, pass `--skip-triggers`. The generator writes the Lua scripts plus a JSON manifest and a copy-ready XML snippet instead of `assets.xml`.
+4. **If you use other mods, scan them and generate again.**
 
-The four region configs are templates. They hide nothing until you replace the placeholder session GUID. The demo is the only runnable example.
+   ```sh
+   python3 src/scan_mods.py --preset new_world --game-dir "/path/to/Anno 1800" --out compat.json
+   python3 src/generate.py --config path/to/your/config.json --compat compat.json
+   ```
 
-To see the gate work without making a custom session, use `examples/demo_new_world/config.json`. It hides the New World tier tabs while you are in the New World. That is a test only; remove it after checking.
+5. **Copy the generated folder and `companions/streets_unified`** into the game's mods folder. Install **one copy** of Streets Unified.
+6. **Test in game.** Enter your custom session. The host tier tabs should be gone. Leave the session. The normal menu should return with the progress the player earned.
+
+The full walkthrough, every parameter, and every command are in the **[step-by-step setup guide](docs/step-by-step.md)**.
 
 ## How it works
 
-This section is the short version. `docs/how_it_works.md` explains every call and every trigger.
+### The problem
 
-### Region and session
+The construction menu belongs to the region. A custom session inside the New World opens with the Jornaleros, Obreros, and Artistas tabs. The gate removes those tabs **only while the player is in your session**.
 
-A region is a ruleset and a set of menus: the Old World, the New World, the Arctic, or Enbesa. A session is one map inside a region. The normal New World and your custom New World session are two sessions in the same region.
+### The rule the gate uses
 
-The construction menu belongs to the region. That is why a custom session inside the New World opens with the Jornaleros, Obreros, and Artistas tabs.
+A tab is shown when **at least one building inside it is available**. There is no switch that hides a tab directly. This was tested:
 
-### The rule the gate depends on
+- Locking the tab's category did nothing.
+- Locking every building inside the tab hid it.
 
-A tab is shown when at least one building inside it is available. There is no switch that hides a tab directly. This was tested: locking the tab's category did nothing, and locking every building inside the tab hid it.
+So the gate hides a tab by locking every building in it. The reverse also matters: **one available building keeps the whole tab visible**.
 
-So the gate hides a tab by locking every building in it. The reverse matters too: one building left available keeps the whole tab visible.
-
-### Base game only
-
-Using the New World as the example:
-
-1. `src/extract_tier_menu.py` reads the game's `assets.xml` and walks the three tier tabs. It writes the list of items: 101 building leaves (two of them streets), 8 nested submenus, and the 3 tab categories, for 112 IDs.
-2. Two of those IDs are the New World streets, `101308` and `101309`. The generator moves them to the keep-unlocked list, which leaves 110 items to lock.
-3. `src/generate.py` writes a small mod: `modinfo.json`, one XML trigger per session, and three Lua files per module.
-4. When you enter the custom session, the hide trigger runs `hide.lua`. It locks every item on the list. Every building in the three tabs is unavailable, so the tabs disappear.
-5. When you leave, a show trigger runs `show.lua`. It does not hand out unlocks. For each item it asks the game which unlock trigger normally gives that item, then asks the game to register that trigger for the player again. The game then recalculates what the player earned. This is why a new player does not get the whole menu back.
-6. A marker file in the game's `logs` folder makes the restore one-shot per visit. The hide script deletes the marker, so the next visit restores again.
-7. In creative mode the game does not run progression triggers, so `creative.lua` unlocks every item directly.
-8. The trigger uses `ConditionActiveSession` and re-checks every 2 seconds. A save that loads straight into the session, or a save made before the mod existed, still gets the right state. This was a real bug in an early version: a one-shot "player entered the session" event never fired on those saves.
-
-### Streets Unified and why it is mandatory
-
-Streets are buildings inside the tier tabs, and the game keeps them available all the time. That breaks the lock-everything rule:
-
-- Lock the streets with the rest of the tab and the player cannot build roads.
-- Leave them available and one available building keeps the tab visible.
-
-The same building cannot be locked in one session and unlocked in another, because unlock state belongs to the player, not the session. The scripts change it when the session changes. A building that must always be available cannot take part in that change.
-
-Streets Unified moves the streets of all four regions into their own Streets tab, removes them from the tier tabs, and unlocks them in every session. The gate never locks the Streets tab, so roads stay available and the tier tabs can be emptied.
-
-The companion is in `companions/streets_unified`. See `companions/README.md` for the per-region IDs.
-
-### With mods
-
-A mod can add buildings to a vanilla tier tab. The core list knows the base game, not that mod, so the mod's building stays available and the tab reappears with one item.
-
-1. `src/scan_mods.py` scans the game's mod folders, reads each mod's XML edits, and records what the mod adds to the host region's tier tabs. It writes `compat.json`.
-2. `src/generate.py --compat compat.json` adds a separate compatibility module. The core module does not change. Each module has its own Lua files and triggers.
-3. Entering the custom session now locks the base game items and the mod items. Leaving restores both modules.
-
-A mod that adds its own new tab is a different case. That tab is not a base game tier tab, so the scanner reports it under `new_tabs` and leaves it visible. Add it by hand if your custom session should hide it.
-
-The scanner understands the common ModOp forms: `add`, `addNextSibling`, `addPrevSibling`, `insert`, `merge`, and `remove`. It is experimental because an unusual mod edit can slip past it. The failure direction matters: missing an item leaves it visible in the custom session, while locking an extra item does nothing. The report lists every item and the mod it came from.
-
-### The parts of this project
+### The moving parts
 
 | Part | What it does |
 |---|---|
-| `presets/<region>.json` | The menu node, tier tabs, street IDs, and host sessions for one region. |
+| `presets/<region>.json` | The region menu node, tier tabs, street IDs, and host sessions. |
 | `presets/items/<region>_core.json` | The generated item list: tabs, nested submenus, and leaves. |
 | `src/extract_tier_menu.py` | Reads the game's `assets.xml` and writes an item list. |
-| `src/discover_regions.py` | Reads the region menus and drafts presets after a game update. |
-| `src/scan_mods.py` | Scans installed mods and writes a compatibility list. Experimental. |
-| `src/generate.py` | Writes the gate mod from a config, a preset, and optional compatibility list. |
-| `templates/*.lua` and `templates/*.xml` | The gate scripts and trigger shapes. Do not edit generated copies. |
-| `companions/streets_unified` | The required street companion mod. |
-| `examples/` | Configs for each host region, plus a New World demo. |
+| `src/discover_regions.py` | Drafts presets after a game update. |
+| `src/scan_mods.py` | Finds what installed mods add to the host tier tabs. **Experimental.** |
+| `src/generate.py` | Writes the gate mod from a config, a preset, and an optional compatibility list. |
+| `templates/*.lua` and `templates/*.xml` | The generated scripts and trigger shapes. |
+| `companions/streets_unified` | The required street companion. |
+| `examples/` | A config per region, plus a New World demo. |
 | `tests/` | Fixture mods, generator checks, preset checks, and repository checks. |
-| `AGENTS.md` | A step-by-step workflow for an AI coding agent helping a modder. |
 
-## Compatibility
+### Base game example
 
-The scanner reads the three folders the loader scans:
+1. `src/extract_tier_menu.py` lists the host region's tier tabs. For the New World, that is 101 leaves (99 buildings and 2 streets), 8 nested submenus, and 3 tab categories, for **112 items**.
+2. Two of those are the New World streets, `101308` and `101309`. The generator moves them to the **keep-unlocked** list, leaving **110 items to lock**.
+3. Entering the custom session runs `hide.lua`, which locks all 110 items. The three tabs have nothing available, so they disappear.
+4. Leaving the session runs `show.lua`. It does **not** hand out unlocks. It asks the game which trigger normally grants each item, then registers those triggers again. The game recalculates what the player earned.
+5. A marker file makes the restore one-shot per visit. The hide script deletes it, so the next visit restores again.
+6. Creative mode has no progression. A separate script unlocks the items directly.
+7. The trigger re-checks every **2 seconds**, so a save that loads directly into the session, or a save made before the mod existed, still gets the right state.
 
-1. `<game install>/mods`
-2. `Documents/Anno 1800/mods` inside the Windows or Wine user folder
-3. `C:/users/Public/mod.io/4169/mods`
+The full trigger and Lua explanation is in [docs/how_it_works.md](docs/how_it_works.md).
 
-On Linux, pass `--game-dir` because the install can be on any mount. The Documents and mod.io folders inside common Wine and Steam prefixes are found automatically.
+### Streets Unified and why it is required
 
-It does not read `mod-loader.log`. That log only describes the last launch and misses anything downloaded since.
+Streets are buildings inside the tier tabs, and the game keeps them available all the time. The gate cannot both lock and keep a building available:
 
-It respects `activations.json` and the `-` folder prefix, and when two folders hold the same ModID it keeps the higher version. The loader's exact order between folders is not documented, so the scanner warns when it has to choose.
+- **Lock the streets** and the player cannot build roads in the custom session.
+- **Leave them available** and one available building keeps the tab visible.
 
-Example:
+Unlock state belongs to the player, not the session. A building that must stay available all the time cannot take part in the session flip.
 
-```sh
-python src/scan_mods.py --preset new_world \
-  --game-dir "/path/to/Anno 1800" \
-  --assets "/path/to/assets.xml" \
-  --out compat.json
+Streets Unified moves each region's streets into their own **Streets tab**, removes them from the tier tabs, and unlocks them in every session. The gate never locks that tab, so roads stay available and the tier tabs can be emptied. See [docs/streets_unified.md](docs/streets_unified.md).
 
-python src/generate.py --config examples/new_world/config.json --compat compat.json
+### With mods
+
+A mod can add buildings to a vanilla tier tab. The core list does not know them, so they stay available and the tab reappears.
+
+1. `src/scan_mods.py` reads the installed mods and writes `compat.json`.
+2. `src/generate.py --compat compat.json` adds a **separate compatibility module**.
+3. Entering the session locks the base items and the mod items. Leaving restores both modules.
+
+A mod that adds its own **new tab** is reported under `new_tabs` and left visible. Add it by hand if your session should hide it.
+
+## Compatibility scanner
+
+The scanner reads the mod folders directly. It does **not** read `mod-loader.log`, because that log only describes the last launch and misses anything downloaded since.
+
+### Windows
+
+| Folder | Path | How the scanner finds it |
+|---|---|---|
+| Install mods | `<game install>\mods` | Pass `--game-dir` if auto-detection misses it. |
+| Documents mods | `%USERPROFILE%\Documents\Anno 1800\mods` | Found automatically. |
+| mod.io mods | `C:\Users\Public\mod.io\4169\mods` | Found automatically. |
+
+```bat
+python src\scan_mods.py --preset new_world --game-dir "C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\games\Anno 1800" --out compat.json
 ```
 
-`--assets` lets the scanner expand nested vanilla categories. Without it, the scanner warns that part of the menu is unreadable.
+### Linux
+
+The game install can be on any mount, so **always pass `--game-dir`**. The scanner reads `<game-dir>/mods`.
+
+| Folder | Common path | How the scanner finds it |
+|---|---|---|
+| Install mods | `/path/to/Anno 1800/mods` | Pass `--game-dir`. |
+| Steam Proton Documents | `~/.steam/steam/steamapps/compatdata/916440/pfx/drive_c/users/steamuser/Documents/Anno 1800/mods` | Found automatically, including `~/.local/share/Steam` and the Flatpak path. |
+| Wine Documents | `~/.wine/drive_c/users/<user>/Documents/Anno 1800/mods` | Found automatically. |
+| Lutris Documents | `~/Games/<game>/drive_c/users/<user>/Documents/Anno 1800/mods` | Found automatically. |
+| mod.io | `.../drive_c/users/Public/mod.io/4169/mods` | Found automatically inside the prefixes above. |
+
+```sh
+python3 src/scan_mods.py --preset new_world --game-dir "/path/to/Anno 1800" --out compat.json
+```
+
+If your prefix is somewhere unusual, pass `--documents` and `--modio` directly. Use `--print-roots` to see every folder the scanner checked, `--mods-root` for an extra folder, and `--no-autodetect` to scan only the folders you pass.
+
+### What the scanner respects
+
+- **`activations.json`**: mods listed in `disabledIds` are skipped.
+- **The `-` folder prefix**: a disabled mod.
+- **Duplicate ModIDs**: the **higher version** wins. The loader's exact order between folders is not documented, so the scanner warns when it has to choose.
+- **Symlinks and components**: followed, like the loader does.
+- **`.lnk` folder links**: followed when the target is a folder.
+- **`.zip` mods**: **not scanned**. The scanner warns and asks you to extract the folder.
+
+### What the scanner does not do
+
+- It does not read `mod-loader.log`.
+- It does not scan zip mods.
+- It cannot know a mod's runtime behaviour. It reads the files as written.
+- It cannot guarantee it understood every possible mod edit. **Over-inclusion is safe**: locking an item that is not in the menu does nothing. Missing an item leaves it visible in your session.
+
+The full scanner reference is in [docs/compatibility.md](docs/compatibility.md).
 
 ## Supported regions
 
-The presets cover the four vanilla host regions. See `docs/regions.md` for the tab IDs, item counts, and the test status of each one. If a game update changes the menu, run `src/discover_regions.py` to draft new presets and compare them with the shipped ones.
+| Region | Preset | Tier tabs | Items to lock | In-game test |
+|---|---|---|---|---|
+| New World | `new_world` | 3 | 110 | **Yes** |
+| Old World | `old_world` | 7 | 148 | **Not yet** |
+| Arctic | `arctic` | 2 | 35 | **Not yet** |
+| Enbesa | `enbesa` | 2 | 63 | **Not yet** |
+
+A custom session inside **Cape Trelawney** uses the `old_world` preset. The tab IDs and the test status of each region are in [docs/regions.md](docs/regions.md).
 
 ## Documentation
 
-- `docs/how_it_works.md`: the full explanation, including what each Lua call does.
-- `docs/streets_unified.md`: the street problem in detail.
-- `docs/regions.md`: the four host regions and their tab IDs.
-- `docs/configuration.md`: every config field and a complete example.
-- `docs/compatibility.md`: the scanner, its limits, and manual overrides.
-- `docs/troubleshooting.md`: symptoms, causes, and the approaches that do not work.
-- `docs/versioning.md`: alpha status, tags, and how updates are shipped.
-- `docs/faq.md`: short answers to common questions.
-- `docs/development.md`: repository layout, tests, and the release checklist.
-- `AGENTS.md`: instructions for an AI coding agent to set up a gate for a modder.
-- `CONTRIBUTING.md`: how to report a bug, suggest a change, or send a pull request.
-- `CHANGELOG.md`: what changed in each version.
+| Document | What it covers |
+|---|---|
+| **[Step-by-step setup](docs/step-by-step.md)** | **Start here.** One region, one config, one generated mod, every parameter. |
+| [Configuration reference](docs/configuration.md) | Every field and every command. |
+| [How it works](docs/how_it_works.md) | The trigger, the Lua calls, and the marker. |
+| [Streets Unified](docs/streets_unified.md) | Why the companion is required. |
+| [Regions](docs/regions.md) | The four host regions and their tab IDs. |
+| [Compatibility](docs/compatibility.md) | The scanner, its limits, and manual entries. |
+| [Troubleshooting](docs/troubleshooting.md) | Symptoms, causes, and the approaches that do not work. |
+| [Roadmap](docs/roadmap.md) | Planned work and done criteria. |
+| [Versioning](docs/versioning.md) | Alpha status, tags, and releases. |
+| [FAQ](docs/faq.md) | Short answers. |
+| [Development](docs/development.md) | Repository layout, tests, and the release checklist. |
+| [AGENTS.md](AGENTS.md) | A workflow for an AI coding agent helping a modder. |
+| [Examples](examples/README.md) | The region configs and the demo. |
+| [Companion](companions/README.md) | Streets Unified. |
+| [Contributing](CONTRIBUTING.md) | Bug reports, pull requests, and code style. |
+| [Changelog](CHANGELOG.md) | What changed in each version. |
+| [Credits](CREDITS.md) | Authorship and attribution. |
 
 ## Versioning
 
-The project follows semantic versioning with pre-release tags. The current version is `0.1.0-alpha.2`. Releases are tagged `v0.1.0-alpha.2` and later. The generated mod carries the toolkit version in its file headers and in `menugate.config.json`, so a generated folder can always be traced back to the tool that made it.
+The project follows **semantic versioning** with pre-release tags. The current version is **`0.1.0-alpha.3`**. Releases are tagged `v0.1.0-alpha.3` and later.
 
-The version stays in the alpha range until every supported host region has had an in-game pass. See `docs/versioning.md`.
+The generated mod carries the toolkit version in its file headers and in `menugate.config.json`, so a generated folder can always be traced back to the tool that made it. The version stays in the alpha range until every supported host region has had an in-game pass. See [docs/versioning.md](docs/versioning.md).
+
+## Credits
+
+**If you publish a mod that uses this project, credit Panther (Panther-Mughil) and link to the [Anno_Session_Regions](https://github.com/Panther-Mughil/Anno_Session_Regions) repository.**
+
+*A line in your mod description is enough.* Streets Unified is by Panther and is included under the same license. **Aveline (AI)** is the AI assistant that helped build the project. More in [CREDITS.md](CREDITS.md).
+
+Anno 1800 is a trademark of Ubisoft. This project is not affiliated with or endorsed by Ubisoft.
 
 ## Reporting bugs and asking questions
 
-Open an issue on GitHub. The issue templates ask for the game version, host region, config, mod list, and the loader log. You do not need to be a programmer to report a problem; a clear description and the files the template asks for are enough.
+Open an issue on GitHub. The templates ask for the game version, host region, config, mod list, and loader log. You do not need to be a programmer to report a problem. A clear description and the files the template asks for are enough.
 
-For a security concern, read `SECURITY.md` before posting details in public.
+For a security concern, read [SECURITY.md](SECURITY.md) before posting details in public.
 
 ## Contributing
 
-Contributions are welcome, including translations of the guide, new region presets, and scanner fixes. Read `CONTRIBUTING.md` first. The project uses the Contributor Covenant code of conduct.
+Contributions are welcome, including region test reports, documentation fixes, new presets, and scanner improvements. Read [CONTRIBUTING.md](CONTRIBUTING.md) first. The project uses the [Contributor Covenant](CODE_OF_CONDUCT.md).
 
-## License and credits
+## License
 
-MIT. You may use, change, and share this project for any purpose. The only condition is that you keep the copyright notice and the license text with copies of the project. See `LICENSE`.
-
-Streets Unified is by Panther and is included under the same license.
-
-Anno 1800 is a trademark of Ubisoft. This project is not affiliated with or endorsed by Ubisoft.
+**MIT.** You may use, change, and share the project. Keep the copyright notice and license text with copies. **If you publish a mod that uses it, credit Panther and link to this repository.** See [LICENSE](LICENSE).

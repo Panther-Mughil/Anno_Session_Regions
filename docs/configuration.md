@@ -1,5 +1,7 @@
 # Config reference
 
+New to the project? Read `docs/step-by-step.md` first. It explains the fields in order.
+
 The generator reads one JSON file. The examples under `examples/` are complete configs you can copy.
 
 ## Top level
