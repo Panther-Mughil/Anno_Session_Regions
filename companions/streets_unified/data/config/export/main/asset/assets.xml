@@ -19,6 +19,15 @@
                         </Item>
                     </BuildingList>
                 </ConstructionCategory>
+                <Text>
+                    <LocaText>
+                        <English>
+                            <Text>Streets</Text>
+                            <Status>Exported</Status>
+                        </English>
+                    </LocaText>
+                </Text>
+                <Locked />
             </Values>
         </Asset>
     </ModOp>
@@ -43,6 +52,15 @@
                         </Item>
                     </BuildingList>
                 </ConstructionCategory>
+                <Text>
+                    <LocaText>
+                        <English>
+                            <Text>Streets</Text>
+                            <Status>Exported</Status>
+                        </English>
+                    </LocaText>
+                </Text>
+                <Locked />
             </Values>
         </Asset>
     </ModOp>
@@ -67,6 +85,15 @@
                         </Item>
                     </BuildingList>
                 </ConstructionCategory>
+                <Text>
+                    <LocaText>
+                        <English>
+                            <Text>Streets</Text>
+                            <Status>Exported</Status>
+                        </English>
+                    </LocaText>
+                </Text>
+                <Locked />
             </Values>
         </Asset>
     </ModOp>
@@ -88,6 +115,15 @@
                         </Item>
                     </BuildingList>
                 </ConstructionCategory>
+                <Text>
+                    <LocaText>
+                        <English>
+                            <Text>Streets</Text>
+                            <Status>Exported</Status>
+                        </English>
+                    </LocaText>
+                </Text>
+                <Locked />
             </Values>
         </Asset>
     </ModOp>

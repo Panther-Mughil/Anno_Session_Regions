@@ -8,10 +8,10 @@
   "category": "Gameplay",
   "region": "old_world",
   "hide_session": {
-    "guid": 900000001,
+    "guid": 900000002,
     "name": "My Custom Session"
   },
-  "trigger_guid_base": 900000100,
+  "trigger_guid_base": null,
   "script_prefix": "my_gate",
   "marker_dir": "logs",
   "streets_unified": {

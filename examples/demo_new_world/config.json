@@ -11,7 +11,7 @@
     "guid": 180025,
     "name": "New World (demo)"
   },
-  "trigger_guid_base": 900000500,
+  "trigger_guid_base": null,
   "script_prefix": "demo_gate",
   "marker_dir": "logs",
   "streets_unified": {

@@ -32,7 +32,9 @@ The gate never locks the Streets tab. Roads stay available in the custom session
 
 ## Installing
 
-Copy `companions/streets_unified` into the game's mods folder next to the generated gate. The generated `modinfo.json` already contains:
+Copy `companions/streets_unified` into the game's mods folder next to the generated gate. Install one copy only. If you already have the original Streets Unified, do not install both; the loader deduplicates by ModID and keeps one, which makes updates confusing.
+
+The generated `modinfo.json` already contains:
 
 ```json
 "ModDependencies": ["Streets_Unified"],

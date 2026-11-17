@@ -63,6 +63,10 @@ To hide it, add a module with the tab's contents:
 
 Use the item list from the mod's category asset. The module gets its own hide and restore triggers.
 
+## The generator says trigger_guid_base is empty
+
+That is deliberate. Open the config and set `trigger_guid_base` to the first free GUID in your own range, or pass `--guid-base 2001202271` on the command line. The examples leave it empty because the toolkit cannot know your range. See `docs/configuration.md`.
+
 ## The scanner finds no mods
 
 1. Run `python src/scan_mods.py --preset new_world --print-roots`. It prints the folders it checked.

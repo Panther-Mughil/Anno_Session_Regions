@@ -1,14 +1,45 @@
 {
-  "Version": "1.0.0",
+  "Anno": 7,
+  "Version": "0.1.0",
   "ModID": "Streets_Unified",
   "Category": {
-    "English": "Shared"
+    "Chinese": null,
+    "English": "Shared",
+    "French": null,
+    "German": null,
+    "Italian": null,
+    "Japanese": null,
+    "Korean": null,
+    "Polish": null,
+    "Russian": null,
+    "Spanish": null,
+    "Taiwanese": null
   },
   "ModName": {
-    "English": "Streets Unified"
+    "Chinese": null,
+    "English": "Streets Unified",
+    "French": null,
+    "German": null,
+    "Italian": null,
+    "Japanese": null,
+    "Korean": null,
+    "Polish": null,
+    "Russian": null,
+    "Spanish": null,
+    "Taiwanese": null
   },
   "Description": {
-    "English": "Moves each region's street buildings into their own Streets tab and keeps them unlocked in every session."
+    "Chinese": null,
+    "English": "Moves each region's street buildings into their own Streets tab and keeps them unlocked in every session.",
+    "French": null,
+    "German": null,
+    "Italian": null,
+    "Japanese": null,
+    "Korean": null,
+    "Polish": null,
+    "Russian": null,
+    "Spanish": null,
+    "Taiwanese": null
   },
   "CreatorName": "Panther",
   "KnownIssues": []

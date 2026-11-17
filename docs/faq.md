@@ -38,6 +38,10 @@ If a marker file is left behind, delete `logs/<prefix>_<module>.restore` in the 
 
 Unlocking every item would give a new player content they never earned. Reading the current unlock state reports the game's defaults, not progress. Re-registering the game's own unlock triggers restores the rules, and the game then decides what the player earned. That is the only approach that kept a fresh save honest.
 
+## Why is trigger_guid_base empty?
+
+The toolkit does not own a GUID range. Every modder has their own, and the examples cannot guess yours. They leave the field `null` and the generator stops until you fill it with the first free GUID in your range. You can also pass `--guid-base` on the command line. This prevents the examples from quietly shipping trigger GUIDs that collide with another mod.
+
 ## Why 2 seconds?
 
 The trigger condition is checked on a timer. The condition itself stays true for the whole session; the timer makes the action run again after a session change. Two seconds is the value used by the tested gate. A shorter value would add calls without changing the result; a longer value makes the menu lag the session change.

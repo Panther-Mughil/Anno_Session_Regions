@@ -24,7 +24,9 @@ It also removes those buildings from the host tier tabs and adds a trigger (2001
 
 ## Installing
 
-Copy the `streets_unified` folder into the game's mods folder. It must load before the gate; the generated `modinfo.json` already lists it in `ModDependencies` and `LoadAfterIds`, so the loader orders it correctly and warns if it is missing.
+Copy the `streets_unified` folder into the game's mods folder. Install one copy only. If you already have the original Streets Unified, do not install both; the loader deduplicates by ModID and keeps one.
+
+It must load before the gate; the generated `modinfo.json` already lists it in `ModDependencies` and `LoadAfterIds`, so the loader orders it correctly and warns if it is missing.
 
 Do not merge this folder into the generated gate. Keep it as its own mod.
 

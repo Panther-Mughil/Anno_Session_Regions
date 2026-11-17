@@ -20,7 +20,7 @@ def config() -> dict:
         "category": "Gameplay",
         "region": "new_world",
         "hide_session": {"guid": 900000001, "name": "Test Session"},
-        "trigger_guid_base": 900000100,
+        "trigger_guid_base": 1900000100,
         "script_prefix": "test_gate",
         "marker_dir": "logs",
         "modules": [
@@ -64,6 +64,9 @@ def test_generate_writes_a_complete_mod(tmp_path: Path) -> None:
     assert modinfo["ModID"] == "TestGate"
     assert modinfo["ModDependencies"] == ["Streets_Unified"]
     assert modinfo["LoadAfterIds"] == ["Streets_Unified"]
+    assert set(modinfo["ModName"]) == set(generate.LANGUAGES)
+    assert modinfo["ModName"]["English"] == "Test Gate"
+    assert modinfo["ModName"]["German"] is None
 
     tree = ET.parse(out / "data/config/export/main/asset/assets.xml")
     assert len(tree.getroot().findall("ModOp")) == 11
@@ -98,6 +101,24 @@ def test_compat_file_adds_a_second_module(tmp_path: Path) -> None:
     assert (out / "data/script/test_gate_compat_hide.lua").exists()
     tree = ET.parse(out / "data/config/export/main/asset/assets.xml")
     assert len(tree.getroot().findall("ModOp")) == 22
+
+
+def test_empty_trigger_base_is_rejected(tmp_path: Path) -> None:
+    data = config()
+    data["trigger_guid_base"] = None
+    cfg = write_config(tmp_path, data)
+    preset, preset_path = generate.load_preset("new_world")
+    with pytest.raises(generate.ToolError):
+        generate.build(data, cfg, tmp_path / "out", preset, preset_path, None, False)
+
+
+def test_guid_range_overflow_is_rejected(tmp_path: Path) -> None:
+    data = config()
+    data["trigger_guid_base"] = 2147483647
+    cfg = write_config(tmp_path, data)
+    preset, preset_path = generate.load_preset("new_world")
+    with pytest.raises(generate.ToolError):
+        generate.build(data, cfg, tmp_path / "out", preset, preset_path, None, False)
 
 
 def test_hide_session_cannot_be_a_show_session() -> None:

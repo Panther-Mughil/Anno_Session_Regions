@@ -39,6 +39,8 @@ The suite covers:
 - `test_presets.py`: the four shipped presets and item lists against expected counts.
 - `test_scan_mods.py`: fixture mods, duplicate ModIDs, disabled mods, new tabs, nested categories, and removals.
 - `test_repo_hygiene.py`: version format, no developer paths in shipped code, no private project names in the public repository.
+- `test_companion.py`: the Streets Unified categories, the 11 text files, and the 11-key modinfo.
+- `test_examples.py`: the examples leave the trigger base empty and use distinct placeholder session GUIDs.
 
 The tests do not need a game install. Keep them that way so CI can run anywhere.
 
@@ -98,5 +100,7 @@ Scanner tests build small mod trees in a temporary folder. When you add a new Mo
 5. Update the support table in the README.
 6. Commit, tag with `v` plus the version, and push the tag.
 7. Create a GitHub release with the notes and the archive.
+
+CI generates the four examples with `--guid-base 1900000000`, a test-only value. The example configs stay empty so users must choose their own range.
 
 The release checklist in `docs/versioning.md` has the same steps with more detail.

@@ -16,9 +16,20 @@ First public alpha.
 - Compatibility scanner for installed mods, with duplicate ModID handling, activation handling, symlink support, and source attribution per item.
 - Streets Unified companion mod, required by the gate.
 - Examples for each region and a New World demo config.
-- Documentation: how it works, streets, regions, compatibility, troubleshooting, versioning, FAQ, and development.
+- Documentation: how it works, streets, regions, configuration, compatibility, troubleshooting, versioning, FAQ, and development.
 - Test suite covering extraction, generation, presets, the scanner, and repository hygiene.
 - GitHub issue templates, pull request template, CI workflow, code of conduct, contribution guide, and security policy.
+
+### Changed
+
+- Example configs leave `trigger_guid_base` empty. The generator stops until a value is filled in or passed with `--guid-base`.
+- Each example uses a different placeholder session GUID so copied configs do not collide.
+
+### Fixed
+
+- The generated `modinfo.json` carries all 11 language keys.
+- The generator rejects an empty trigger base, an int32 overflow, and warns on a version that is not three numbers.
+- Streets Unified categories carry `Text` and `Locked` blocks, and all 11 language text files label the Streets tab.
 
 ### Tested
 

@@ -45,7 +45,7 @@ jobs:
       - name: Generate examples
         run: |
           for region in new_world old_world arctic enbesa; do
-            python src/generate.py --config "examples/$region/config.json"
+            python src/generate.py --config "examples/$region/config.json" --guid-base 1900000000
           done
 
       - name: Check generated files

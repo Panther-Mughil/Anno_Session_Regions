@@ -46,6 +46,11 @@ def main() -> int:
         if "Streets_Unified" not in dependencies:
             print(f"error: {path} does not depend on Streets_Unified", file=sys.stderr)
             return 1
+        for field in ("Category", "ModName", "Description"):
+            values = data.get(field, {})
+            if len(values) != 11 or "English" not in values:
+                print(f"error: {path} field {field} does not carry all 11 languages", file=sys.stderr)
+                return 1
 
     luac = find_luac()
     if luac:

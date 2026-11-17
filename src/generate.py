@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from string import Template
@@ -46,6 +47,24 @@ from version import __version__  # noqa: E402
 
 TOOLKIT_NAME = "Anno Session Regions"
 DEFAULT_INCLUDE = ["leaves", "containers", "tabs"]
+LANGUAGES = (
+    "Chinese",
+    "English",
+    "French",
+    "German",
+    "Italian",
+    "Japanese",
+    "Korean",
+    "Polish",
+    "Russian",
+    "Spanish",
+    "Taiwanese",
+)
+
+
+def localized(value: str) -> dict:
+    """All 11 modinfo language keys, with the English value filled in."""
+    return {language: (value if language == "English" else None) for language in LANGUAGES}
 
 
 def load_templates() -> dict[str, Template]:
@@ -136,9 +155,23 @@ def resolve_show_sessions(config: dict, hide: dict) -> list[dict]:
 
 
 def validate_config(config: dict) -> None:
-    for field in ("mod_id", "mod_name", "hide_session", "trigger_guid_base", "script_prefix", "modules"):
+    for field in ("mod_id", "mod_name", "hide_session", "script_prefix", "modules"):
         if field not in config:
             raise ToolError(f"config is missing: {field}")
+    if "trigger_guid_base" not in config or config["trigger_guid_base"] in (None, "", 0, "0"):
+        raise ToolError(
+            "trigger_guid_base is empty. Choose the first free GUID in your own "
+            "range and put it in the config, or pass --guid-base."
+        )
+    try:
+        base = int(config["trigger_guid_base"])
+    except (TypeError, ValueError):
+        raise ToolError("trigger_guid_base must be a number")
+    if not 0 < base <= 2147483647:
+        raise ToolError("trigger_guid_base must be between 1 and 2147483647")
+    config["trigger_guid_base"] = base
+    if not re.fullmatch(r"\d+\.\d+\.\d+", str(config.get("version", "0.1.0"))):
+        warn("version is best written as three numbers, for example 1.0.0")
     if config.get("schema_version", 1) != 1:
         raise ToolError("this version of generate.py understands config schema_version 1")
     if any(character.isspace() for character in str(config["mod_id"])):
@@ -147,6 +180,11 @@ def validate_config(config: dict) -> None:
         warn("script_prefix is best kept to letters, numbers and underscores")
     if not config["modules"]:
         raise ToolError("config has no modules")
+    if int(config["trigger_guid_base"]) in (900000100, 900000500):
+        warn(
+            "trigger_guid_base is the example placeholder; choose a free band "
+            "in your own GUID range before publishing"
+        )
 
 
 def build(config: dict, config_path: Path, out_dir: Path, preset: dict, preset_path: Path, compat: dict | None, dry_run: bool) -> dict:
@@ -209,6 +247,9 @@ def build(config: dict, config_path: Path, out_dir: Path, preset: dict, preset_p
                 raise ToolError(f"trigger GUID {guid} is also an item GUID; move trigger_guid_base")
             used_trigger_guids.add(guid)
         module["trigger_count"] = count
+
+    if next_guid - 1 > 2147483647:
+        raise ToolError("the trigger GUID range exceeds the int32 limit; move trigger_guid_base lower")
 
     if dry_run:
         return {
@@ -295,9 +336,9 @@ def build(config: dict, config_path: Path, out_dir: Path, preset: dict, preset_p
     modinfo = {
         "Version": str(config.get("version", "0.1.0")),
         "ModID": config["mod_id"],
-        "Category": {"English": config.get("category", "Gameplay")},
-        "ModName": {"English": config["mod_name"]},
-        "Description": {"English": config.get("description", "")},
+        "Category": localized(config.get("category", "Gameplay")),
+        "ModName": localized(config["mod_name"]),
+        "Description": localized(config.get("description", "")),
         "KnownIssues": config.get("known_issues", []),
         "CreatorName": config.get("creator", ""),
     }
@@ -360,6 +401,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--config", required=True, help="Path to the gate config JSON")
     parser.add_argument("--preset", help="Region preset key or path (default: the config's region)")
     parser.add_argument("--compat", help="Compatibility list from scan_mods.py")
+    parser.add_argument("--guid-base", help="First trigger GUID, overriding the config value")
     parser.add_argument("--out", help="Output folder (default: the config's output, or out/<mod_id>)")
     parser.add_argument("--dry-run", action="store_true", help="Print the plan without writing files")
     return parser.parse_args(argv)
@@ -372,6 +414,8 @@ def main(argv: list[str] | None = None) -> int:
         config = read_json(config_path)
         if not isinstance(config, dict):
             raise ToolError(f"config is not an object: {config_path}")
+        if args.guid_base is not None:
+            config["trigger_guid_base"] = args.guid_base
         preset_name = args.preset or config.get("region")
         if not preset_name:
             raise ToolError("config has no region and --preset was not given")

@@ -67,7 +67,7 @@ Python packages are only needed for development. Run `pip install -r requirement
    - `hide_session.guid`: the GUID of your custom session.
    - `hide_session.name`: a readable name, used in trigger names.
    - `mod_id`, `mod_name`, `creator`, and `version`: your mod's values.
-   - `trigger_guid_base`: the first of eleven GUIDs the gate will define. Use a band you own.
+   - `trigger_guid_base`: the first of eleven GUIDs the gate will define. Use a free block in your own range. The example configs leave it empty on purpose; the generator stops until you fill it or pass `--guid-base`.
    - `script_prefix`: a short prefix for the generated Lua files.
 3. Run the generator:
 
@@ -79,6 +79,8 @@ Python packages are only needed for development. Run `pip install -r requirement
 4. Copy the generated folder and `companions/streets_unified` into the game's mods folder.
 5. Start the game and enter your custom session. The host region's tier tabs should be gone. Leave the session and the normal menu should return with the progress you actually earned.
 6. If you use other mods, run the scanner and generate again with the compatibility list. See [Compatibility](#compatibility).
+
+The four region configs are templates. They hide nothing until you replace the placeholder session GUID. The demo is the only runnable example.
 
 To see the gate work without making a custom session, use `examples/demo_new_world/config.json`. It hides the New World tier tabs while you are in the New World. That is a test only; remove it after checking.
 
@@ -187,6 +189,7 @@ The presets cover the four vanilla host regions. See `docs/regions.md` for the t
 - `docs/how_it_works.md`: the full explanation, including what each Lua call does.
 - `docs/streets_unified.md`: the street problem in detail.
 - `docs/regions.md`: the four host regions and their tab IDs.
+- `docs/configuration.md`: every config field and a complete example.
 - `docs/compatibility.md`: the scanner, its limits, and manual overrides.
 - `docs/troubleshooting.md`: symptoms, causes, and the approaches that do not work.
 - `docs/versioning.md`: alpha status, tags, and how updates are shipped.
