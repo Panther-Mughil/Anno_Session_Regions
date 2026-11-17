@@ -66,6 +66,10 @@ One config generates one gate for one host region. The other example configs are
 
 Each module uses one hide trigger, one normal restore per show session, and one creative restore per show session. With the default five vanilla sessions that is 11 per module. Two modules use 22.
 
+For **one custom session with one core module and the default settings, the answer is 11 trigger GUIDs.** Without creative restore it is 6. With a compatibility module it is 22 (or 12 without creative). If the hide session is one of the five vanilla sessions, there are four show sessions, so the count is 9 (or 5 without creative).
+
+The item GUIDs in the lock lists are vanilla IDs. The gate defines only new trigger assets. The Streets Unified companion uses fixed IDs 2001229950 to 2001229954 and does not consume your block.
+
 One region does not reduce the show session count. The gate must restore the menu in every other session the player can enter. If you have a reason to restore in fewer sessions, set `show_sessions` to the ones you use.
 
 ## Manual triggers

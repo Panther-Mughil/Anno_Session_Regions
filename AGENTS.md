@@ -192,7 +192,7 @@ Each module uses:
 1 hide + 1 normal restore per show session + 1 creative restore per show session
 ```
 
-With the default five vanilla sessions, one module uses 11 GUIDs. Two modules use 22. The demo hides the New World inside the New World, so it has four show sessions and uses 9.
+**One custom session with one core module and the default five show sessions uses 11 trigger GUIDs.** Without creative restore it uses 6. With a compatibility module it uses 22, or 12 without creative. The demo hides the New World inside the New World, so it has four show sessions and uses 9.
 
 One region does not reduce the show session count. The gate must restore the menu in every other session the player can enter. If the user has a reason to restore in fewer sessions, they can set `show_sessions` to the sessions they use, but leaving one out means the menu will not restore there.
 

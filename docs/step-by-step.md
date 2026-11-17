@@ -281,6 +281,22 @@ Ask the person testing to check:
 
 The agent or the tool cannot launch the game. The in-game check is the only proof.
 
+## How many trigger GUIDs will I use?
+
+For **one custom session**, one host region, and the default five show sessions:
+
+| Setting | Trigger GUIDs |
+|---|---|
+| Core module, creative on | **11** |
+| Core module, creative off | **6** |
+| Core module plus a compatibility module, creative on | **22** |
+| Core module plus a compatibility module, creative off | **12** |
+| Demo that hides the New World in the New World | **9** |
+
+The formula per module is `1 hide + N normal restores + N creative restores`, where N is the number of show sessions. One custom session does not need the other three regions.
+
+The gate defines only trigger assets. The item GUIDs in the lists are vanilla IDs. The Streets Unified companion uses fixed IDs 2001229950 to 2001229954 and does not use your block.
+
 ## All top-level parameters
 
 | Parameter | Required | What it does |
