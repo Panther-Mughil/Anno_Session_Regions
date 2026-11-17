@@ -272,4 +272,4 @@ Contributions are welcome, including region test reports, documentation fixes, n
 
 ## License
 
-**MIT.** You may use, change, and share the project. Keep the copyright notice and license text with copies. **If you publish a mod that uses it, credit Panther and link to this repository.** See [LICENSE](LICENSE).
+**MIT.** You may use, change, and share the project. Keep the copyright notice and license text with copies. **If you publish a mod that uses it, credit Panther and link to this repository.** See [LICENSE](LICENSE) for the MIT text and [NOTICE](NOTICE) for the credit request.
