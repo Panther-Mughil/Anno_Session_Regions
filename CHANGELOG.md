@@ -4,6 +4,10 @@ All notable changes to this project are listed here. The format follows [Keep a 
 
 ## [Unreleased]
 
+### Changed
+
+- CI uses `actions/checkout` v7, `actions/setup-python` v7, `ubuntu-24.04`, and `pytest` 9.2.0 or newer.
+
 ## [0.1.0-alpha.4] - 2026-11-18
 
 ### Added
