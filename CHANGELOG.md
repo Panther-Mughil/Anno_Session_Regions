@@ -4,6 +4,15 @@ All notable changes to this project are listed here. The format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.0-alpha.6] - 2026-11-18
+
+### Changed
+
+- `LICENSE` is the standard MIT text so GitHub detects the license as MIT.
+- The credit request lives in `NOTICE`. It asks only for Panther credit.
+- The README credit section asks only for Panther credit. The Aveline and Streets Unified lines were removed from that section.
+- No gameplay or generator behavior change.
+
 ## [0.1.0-alpha.5] - 2026-11-18
 
 ### Changed

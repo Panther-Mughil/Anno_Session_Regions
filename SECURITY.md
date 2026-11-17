@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Only the latest release is supported. The current version is `0.1.0-alpha.5`.
+Only the latest release is supported. The current version is `0.1.0-alpha.6`.
 
 ## What counts as a security issue
 

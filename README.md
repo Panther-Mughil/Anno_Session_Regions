@@ -4,7 +4,7 @@ A session-scoped construction menu gate for Anno 1800, with a mod scanner and a 
 
 [![CI](https://github.com/Panther-Mughil/Anno_Session_Regions/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Panther-Mughil/Anno_Session_Regions/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.0--alpha.6-orange.svg)](CHANGELOG.md)
 
 > **New to the project? Read the [step-by-step setup guide](docs/step-by-step.md) first.** It walks through one region, one config, and one generated mod in plain English.
 
@@ -25,7 +25,7 @@ Anno 1800 builds the construction menu from the **region**, not from the **sessi
 
 ## Status
 
-**Alpha, version `0.1.0-alpha.5`.**
+**Alpha, version `0.1.0-alpha.6`.**
 
 The gate mechanism has been tested in game for the **New World** in normal and creative saves. The Old World, Arctic, and Enbesa presets are generated from the same vanilla data and pass the local tests, but they **have not been tested in game yet**. The compatibility scanner is **experimental**.
 
@@ -248,7 +248,7 @@ A custom session inside **Cape Trelawney** uses the `old_world` preset. The tab 
 
 ## Versioning
 
-The project follows **semantic versioning** with pre-release tags. The current version is **`0.1.0-alpha.5`**. Releases are tagged `v0.1.0-alpha.5` and later.
+The project follows **semantic versioning** with pre-release tags. The current version is **`0.1.0-alpha.6`**. Releases are tagged `v0.1.0-alpha.6` and later.
 
 The generated mod carries the toolkit version in its file headers and in `menugate.config.json`, so a generated folder can always be traced back to the tool that made it. The version stays in the alpha range until every supported host region has had an in-game pass. See [docs/versioning.md](docs/versioning.md).
 
