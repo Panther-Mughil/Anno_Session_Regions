@@ -1,0 +1,206 @@
+<ModOps>
+    <!-- START CONSTRUCTION CATEGORY STREETS(Moderate) -->
+    <ModOp Type="addNextSibling" GUID='25000189'>
+        <Asset>
+            <Template>ConstructionCategory</Template>
+            <Values>
+                <Standard>
+                    <GUID>2001229950</GUID>
+                    <Name>Streets</Name>
+                    <IconFilename>data/graphics/icon_street_menu.png</IconFilename>
+                </Standard>
+                <ConstructionCategory>
+                    <BuildingList>
+                        <Item>
+                            <Building>1000178</Building>
+                        </Item>
+                        <Item>
+                            <Building>1010035</Building>
+                        </Item>
+                    </BuildingList>
+                </ConstructionCategory>
+            </Values>
+        </Asset>
+    </ModOp>
+
+    <!-- START CONSTRUCTION CATEGORY STREETS(Colony01) -->
+    <ModOp Type="addNextSibling" GUID='25000193'>
+        <Asset>
+            <Template>ConstructionCategory</Template>
+            <Values>
+                <Standard>
+                    <GUID>2001229951</GUID>
+                    <Name>Streets</Name>
+                    <IconFilename>data/graphics/icon_street_menu.png</IconFilename>
+                </Standard>
+                <ConstructionCategory>
+                    <BuildingList>
+                        <Item>
+                            <Building>101308</Building>
+                        </Item>
+                        <Item>
+                            <Building>101309</Building>
+                        </Item>
+                    </BuildingList>
+                </ConstructionCategory>
+            </Values>
+        </Asset>
+    </ModOp>
+
+    <!-- START CONSTRUCTION CATEGORY STREETS(Africa) -->
+    <ModOp Type="addNextSibling" GUID='114553'>
+        <Asset>
+            <Template>ConstructionCategory</Template>
+            <Values>
+                <Standard>
+                    <GUID>2001229952</GUID>
+                    <Name>Streets</Name>
+                    <IconFilename>data/graphics/icon_street_menu.png</IconFilename>
+                </Standard>
+                <ConstructionCategory>
+                    <BuildingList>
+                        <Item>
+                            <Building>114523</Building>
+                        </Item>
+                        <Item>
+                            <Building>119029</Building>
+                        </Item>
+                    </BuildingList>
+                </ConstructionCategory>
+            </Values>
+        </Asset>
+    </ModOp>
+
+    <!-- START CONSTRUCTION CATEGORY STREETS(Artic) -->
+    <ModOp Type="addNextSibling" GUID='112790'>
+        <Asset>
+            <Template>ConstructionCategory</Template>
+            <Values>
+                <Standard>
+                    <GUID>2001229953</GUID>
+                    <Name>Streets</Name>
+                    <IconFilename>data/graphics/icon_street_menu.png</IconFilename>
+                </Standard>
+                <ConstructionCategory>
+                    <BuildingList>
+                        <Item>
+                            <Building>112113</Building>
+                        </Item>
+                    </BuildingList>
+                </ConstructionCategory>
+            </Values>
+        </Asset>
+    </ModOp>
+
+    <!-- ADD CATEGORIES TO CONSTRUCTION MENU -->
+    <ModOp Type="addPrevSibling" GUID='25000035'
+        Path="/Values/ConstructionMenu/RegionMenu/Moderate/CategoryMode/Tier/Categories/Item[Category='25000189']">
+        <Item>
+            <Category>2001229950</Category>
+        </Item>
+    </ModOp>
+
+    <ModOp Type="addPrevSibling" GUID='25000035'
+        Path="/Values/ConstructionMenu/RegionMenu/Colony01/CategoryMode/Tier/Categories/Item[Category='25000193']">
+        <Item>
+            <Category>2001229951</Category>
+        </Item>
+    </ModOp>
+
+    <ModOp Type="addPrevSibling" GUID='25000035'
+        Path="/Values/ConstructionMenu/RegionMenu/Africa/CategoryMode/Tier/Categories/Item[Category='114553']">
+        <Item>
+            <Category>2001229952</Category>
+        </Item>
+    </ModOp>
+
+    <ModOp Type="addPrevSibling" GUID='25000035'
+        Path="/Values/ConstructionMenu/RegionMenu/Arctic/CategoryMode/Tier/Categories/Item[Category='112790']">
+        <Item>
+            <Category>2001229953</Category>
+        </Item>
+    </ModOp>
+
+    <!-- STREETS UNLOCK TRIGGER -->
+    <ModOp Type="addNextSibling" GUID="130236">
+        <Asset>
+            <Template>Trigger</Template>
+            <Values>
+                <Standard>
+                    <GUID>2001229954</GUID>
+                    <Name>Street Trigger</Name>
+                </Standard>
+                <Trigger>
+                    <TriggerCondition>
+                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                        <Values>
+                            <Condition />
+                            <ConditionAlwaysTrue />
+                        </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                        <Item>
+                            <TriggerAction>
+                                <Template>ActionUnlockAsset</Template>
+                                <Values>
+                                    <Action />
+                                    <ActionUnlockAsset>
+                                        <UnlockAssets>
+                                            <Item>
+                                                <Asset>1000178</Asset>
+                                            </Item>
+                                            <Item>
+                                                <Asset>1010035</Asset>
+                                            </Item>
+                                            <Item>
+                                                <Asset>101308</Asset>
+                                            </Item>
+                                            <Item>
+                                                <Asset>101309</Asset>
+                                            </Item>
+                                            <Item>
+                                                <Asset>114523</Asset>
+                                            </Item>
+                                            <Item>
+                                                <Asset>119029</Asset>
+                                            </Item>
+                                            <Item>
+                                                <Asset>112113</Asset>
+                                            </Item>
+                                        </UnlockAssets>
+                                    </ActionUnlockAsset>
+                                </Values>
+                            </TriggerAction>
+                        </Item>
+                    </TriggerActions>
+                    <ResetTrigger>
+                        <IsBaseAutoCreateAsset>1</IsBaseAutoCreateAsset>
+                        <Values>
+                            <EmptyAutoCreateValue />
+                        </Values>
+                    </ResetTrigger>
+                </Trigger>
+                <TriggerSetup />
+            </Values>
+        </Asset>
+    </ModOp>
+
+    <!-- REMOVE FROM STREET CATEGORIES -->
+    <ModOp Type="remove" GUID="25000189"
+        Path="Values/ConstructionCategory/BuildingList/Item[Building = '1000178']" />
+    <ModOp Type="remove" GUID="25000190"
+        Path="Values/ConstructionCategory/BuildingList/Item[Building = '1010035']" />
+
+    <ModOp Type="remove" GUID="25000193"
+        Path="Values/ConstructionCategory/BuildingList/Item[Building = '101308']" />
+    <ModOp Type="remove" GUID="25000194"
+        Path="Values/ConstructionCategory/BuildingList/Item[Building = '101309']" />
+
+    <ModOp Type="remove" GUID="114553"
+        Path="Values/ConstructionCategory/BuildingList/Item[Building = '114523']" />
+    <ModOp Type="remove" GUID="114554"
+        Path="Values/ConstructionCategory/BuildingList/Item[Building = '119029']" />
+
+    <ModOp Type="remove" GUID="112790"
+        Path="Values/ConstructionCategory/BuildingList/Item[Building = '112113']" />
+</ModOps>

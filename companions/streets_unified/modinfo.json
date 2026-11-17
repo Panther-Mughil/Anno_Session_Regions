@@ -1,0 +1,15 @@
+{
+  "Version": "1.0.0",
+  "ModID": "Streets_Unified",
+  "Category": {
+    "English": "Shared"
+  },
+  "ModName": {
+    "English": "Streets Unified"
+  },
+  "Description": {
+    "English": "Moves each region's street buildings into their own Streets tab and keeps them unlocked in every session."
+  },
+  "CreatorName": "Panther",
+  "KnownIssues": []
+}

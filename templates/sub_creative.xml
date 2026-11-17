@@ -1,0 +1,19 @@
+<SubTriggers>
+                        <Item>
+                            <SubTrigger>
+                                <Template>AutoCreateTrigger</Template>
+                                <Values>
+                                    <Trigger>
+                                        <TriggerCondition>
+                                            <Template>ConditionIsCreativeMode</Template>
+                                            <Values>
+                                                <ConditionPropsNegatable />
+                                                <Condition />
+                                                <ConditionIsCreativeMode />
+                                            </Values>
+                                        </TriggerCondition>
+                                    </Trigger>
+                                </Values>
+                            </SubTrigger>
+                        </Item>
+                    </SubTriggers>

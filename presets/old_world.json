@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "key": "old_world",
+  "display_name": "Old World",
+  "menu_guid": 25000035,
+  "region_node": "Moderate",
+  "host_sessions": [
+    {
+      "guid": 180023,
+      "name": "Old World"
+    }
+  ],
+  "related_sessions": [
+    {
+      "guid": 110934,
+      "name": "Cape Trelawney"
+    }
+  ],
+  "tier_tabs": [
+    {
+      "guid": 25000189,
+      "name": "Farmers"
+    },
+    {
+      "guid": 25000190,
+      "name": "Workers"
+    },
+    {
+      "guid": 25000191,
+      "name": "Artisans"
+    },
+    {
+      "guid": 25000192,
+      "name": "Engineers"
+    },
+    {
+      "guid": 132779,
+      "name": "Tourists"
+    },
+    {
+      "guid": 500447,
+      "name": "Investors"
+    },
+    {
+      "guid": 502107,
+      "name": "Scholars"
+    }
+  ],
+  "street_assets": [
+    1000178,
+    1010035
+  ],
+  "tested_in_game": false,
+  "notes": "Tourists and Scholars need their DLC. On an install without those DLCs the tabs do not exist, and locking their IDs does nothing."
+}

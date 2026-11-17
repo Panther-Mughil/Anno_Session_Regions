@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "key": "enbesa",
+  "display_name": "Enbesa",
+  "menu_guid": 25000035,
+  "region_node": "Africa",
+  "host_sessions": [
+    {
+      "guid": 112132,
+      "name": "Enbesa"
+    }
+  ],
+  "related_sessions": [],
+  "tier_tabs": [
+    {
+      "guid": 114553,
+      "name": "Shepherds"
+    },
+    {
+      "guid": 114554,
+      "name": "Elders"
+    }
+  ],
+  "street_assets": [
+    114523,
+    119029
+  ],
+  "tested_in_game": false,
+  "notes": "The Enbesa menu also lists a creative-only Land of Lions category (10245). It is not a tier tab and is left out."
+}

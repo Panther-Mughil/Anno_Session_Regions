@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "notes": "Vanilla sessions in Anno 1800 GU18.4. The menu gate restores progression in every session except the one it hides.",
+  "sessions": [
+    {
+      "guid": 180023,
+      "name": "Old World"
+    },
+    {
+      "guid": 180025,
+      "name": "New World"
+    },
+    {
+      "guid": 112132,
+      "name": "Enbesa"
+    },
+    {
+      "guid": 180045,
+      "name": "Arctic"
+    },
+    {
+      "guid": 110934,
+      "name": "Cape Trelawney"
+    }
+  ]
+}

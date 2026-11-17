@@ -1,0 +1,40 @@
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+            <Template>Trigger</Template>
+            <Values>
+                <Standard><GUID>${guid}</GUID><Name>${name}</Name></Standard>
+                <Trigger>
+                    <TriggerCondition>
+                        <Template>ConditionActiveSession</Template>
+                        <Values>
+                            <Condition />
+                            <ConditionActiveSession><ActiveSession>${session}</ActiveSession></ConditionActiveSession>
+                        </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                        <Item>
+                            <TriggerAction>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                    <Action />
+                                    <ActionExecuteScript><ScriptFileName>data/script/${script}</ScriptFileName></ActionExecuteScript>
+                                </Values>
+                            </TriggerAction>
+                        </Item>
+                    </TriggerActions>${subs}
+                    <ResetTrigger>
+                        <Template>AutoCreateTrigger</Template>
+                        <Values>
+                            <Trigger>
+                                <TriggerCondition>
+                                    <Template>ConditionTimer</Template>
+                                    <Values><Condition /><ConditionTimer><TimeLimit>2000</TimeLimit></ConditionTimer></Values>
+                                </TriggerCondition>
+                            </Trigger>
+                        </Values>
+                    </ResetTrigger>
+                </Trigger>
+                <TriggerSetup><AutoRegisterTrigger>1</AutoRegisterTrigger></TriggerSetup>
+            </Values>
+        </Asset>
+    </ModOp>

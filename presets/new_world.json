@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "key": "new_world",
+  "display_name": "New World",
+  "menu_guid": 25000035,
+  "region_node": "Colony01",
+  "host_sessions": [
+    {
+      "guid": 180025,
+      "name": "New World"
+    }
+  ],
+  "related_sessions": [],
+  "tier_tabs": [
+    {
+      "guid": 25000193,
+      "name": "Jornaleros"
+    },
+    {
+      "guid": 25000194,
+      "name": "Obreros"
+    },
+    {
+      "guid": 5466,
+      "name": "Artistas"
+    }
+  ],
+  "street_assets": [
+    101308,
+    101309
+  ],
+  "tested_in_game": true,
+  "notes": "The gate mechanism has been tested in game for this region in normal and creative saves. The other regions are generated from the same vanilla data but still need an in-game pass."
+}

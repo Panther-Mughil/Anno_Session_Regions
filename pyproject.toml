@@ -1,0 +1,14 @@
+[project]
+name = "anno-session-regions"
+version = "0.1.0a1"
+description = "A session-scoped construction menu gate for Anno 1800, with a mod scanner and a guide."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Panther Mughil" }]
+keywords = ["anno 1800", "modding", "construction menu", "session"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "key": "arctic",
+  "display_name": "Arctic",
+  "menu_guid": 25000035,
+  "region_node": "Arctic",
+  "host_sessions": [
+    {
+      "guid": 180045,
+      "name": "Arctic"
+    }
+  ],
+  "related_sessions": [],
+  "tier_tabs": [
+    {
+      "guid": 112790,
+      "name": "Explorers"
+    },
+    {
+      "guid": 112791,
+      "name": "Technicians"
+    }
+  ],
+  "street_assets": [
+    112113
+  ],
+  "tested_in_game": false,
+  "notes": "The Arctic menu also lists a creative-only Passage category (10272). It is not a tier tab and is left out."
+}

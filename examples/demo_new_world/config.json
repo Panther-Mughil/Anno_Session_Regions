@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "mod_id": "Demo_NewWorld_Gate",
+  "mod_name": "Demo New World Gate",
+  "creator": "Anno Session Regions",
+  "version": "0.1.0",
+  "description": "Demo only: hides the New World tier tabs while you are in the New World. Remove it after testing.",
+  "category": "Gameplay",
+  "region": "new_world",
+  "hide_session": {
+    "guid": 180025,
+    "name": "New World (demo)"
+  },
+  "trigger_guid_base": 900000500,
+  "script_prefix": "demo_gate",
+  "marker_dir": "logs",
+  "streets_unified": {
+    "required": true
+  },
+  "modules": [
+    {
+      "key": "core",
+      "name": "Base game",
+      "enabled": true,
+      "items_file": "../../presets/items/new_world_core.json"
+    }
+  ]
+}

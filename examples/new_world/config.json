@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "mod_id": "My_Session_Gate_NewWorld",
+  "mod_name": "My Session Gate (New World)",
+  "creator": "Your name",
+  "version": "0.1.0",
+  "description": "Hides the New World tier tabs inside my custom session.",
+  "category": "Gameplay",
+  "region": "new_world",
+  "hide_session": {
+    "guid": 900000001,
+    "name": "My Custom Session"
+  },
+  "trigger_guid_base": 900000100,
+  "script_prefix": "my_gate",
+  "marker_dir": "logs",
+  "streets_unified": {
+    "required": true
+  },
+  "modules": [
+    {
+      "key": "core",
+      "name": "Base game",
+      "enabled": true,
+      "items_file": "../../presets/items/new_world_core.json"
+    }
+  ]
+}
