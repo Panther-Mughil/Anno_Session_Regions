@@ -38,6 +38,14 @@ If a marker file is left behind, delete `logs/<prefix>_<module>.restore` in the 
 
 Unlocking every item would give a new player content they never earned. Reading the current unlock state reports the game's defaults, not progress. Re-registering the game's own unlock triggers restores the rules, and the game then decides what the player earned. That is the only approach that kept a fresh save honest.
 
+## Do I need to generate all four regions?
+
+No. One config generates one gate for one host region. Pick the config for the region your custom session lives in. The other three are alternatives. If you want gates for more than one region, give each config its own mod ID and trigger GUID base.
+
+## Can I add the triggers myself?
+
+Yes. Pass `--skip-triggers` or set `"generate_triggers": false`. The generator writes the Lua scripts and a trigger manifest, `menugate.triggers.json`, plus a copy-ready `menugate.triggers.xml.txt`. Add those triggers to your own `assets.xml` using the GUIDs in the manifest.
+
 ## Why is trigger_guid_base empty?
 
 The toolkit does not own a GUID range. Every modder has their own, and the examples cannot guess yours. They leave the field `null` and the generator stops until you fill it with the first free GUID in your range. You can also pass `--guid-base` on the command line. This prevents the examples from quietly shipping trigger GUIDs that collide with another mod.

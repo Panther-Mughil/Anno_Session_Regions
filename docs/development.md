@@ -40,7 +40,8 @@ The suite covers:
 - `test_scan_mods.py`: fixture mods, duplicate ModIDs, disabled mods, new tabs, nested categories, and removals.
 - `test_repo_hygiene.py`: version format, no developer paths in shipped code, no private project names in the public repository.
 - `test_companion.py`: the Streets Unified categories, the 11 text files, and the 11-key modinfo.
-- `test_examples.py`: the examples leave the trigger base empty and use distinct placeholder session GUIDs.
+- `test_examples.py`: the examples leave the trigger base empty, use distinct placeholder session GUIDs, and point at their own region item list.
+- Manual trigger mode is covered in `test_generate.py`: no `assets.xml`, a JSON manifest, and a copy-ready XML snippet.
 
 The tests do not need a game install. Keep them that way so CI can run anywhere.
 

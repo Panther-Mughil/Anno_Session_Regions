@@ -4,6 +4,18 @@ All notable changes to this project are listed here. The format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.0-alpha.2] - 2026-11-18
+
+### Added
+
+- `--skip-triggers` and `generate_triggers: false`: the generator writes the Lua scripts plus `menugate.triggers.json` and `menugate.triggers.xml.txt` instead of the trigger XML.
+- `AGENTS.md`, a step-by-step workflow for an AI coding agent helping a modder.
+- Tests for manual trigger mode and for single-region example configs.
+
+### Changed
+
+- The documentation states that one config covers one host region. Generating the other three examples is not required. Multi-region use needs a distinct mod ID and trigger GUID base per config.
+
 ## [0.1.0-alpha.1] - 2026-11-18
 
 First public alpha.

@@ -2,6 +2,8 @@
 
 The gate works for a custom session inside any of the four vanilla regions. Each preset records the menu node, the tier tabs, the street buildings, and the host sessions.
 
+Pick one preset per gate. A mod for one region needs one config. The other presets are alternatives, not required steps. If you build gates for several regions, give each one its own mod ID and trigger GUID base.
+
 ## The four presets
 
 | Region | Preset | Menu node | Tier tabs | Items to lock | In-game test |

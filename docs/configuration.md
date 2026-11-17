@@ -20,6 +20,7 @@ The generator reads one JSON file. The examples under `examples/` are complete c
 | `script_prefix` | Yes | The prefix for the generated Lua file names. |
 | `marker_dir` | No | The folder for the restore marker. Default `logs`. |
 | `creative_restore` | No | Generate the creative scripts. Default `true`. |
+| `generate_triggers` | No | Write the trigger XML. Default `true`. Set to `false` to write a manual trigger manifest instead. |
 | `streets_unified` | No | `{ "required": true }` adds the Streets Unified dependency. Default `true`. |
 | `dependencies` | No | Extra ModIDs added to `ModDependencies` and `LoadAfterIds`. |
 | `known_issues` | No | A list written to `KnownIssues` in `modinfo.json`. |
@@ -56,6 +57,23 @@ Each module uses:
 With five vanilla sessions, one module uses 11 GUIDs. Two modules use 22. The generator checks that no trigger GUID is also an item GUID.
 
 Use a free block in your own GUID range. The examples set this to `null` on purpose because the toolkit does not own a range. The generator stops with an error until you fill it, or pass `--guid-base` on the command line. The generator cannot check a band against vanilla or against other installed mods.
+
+One config generates one gate for one host region. The other example configs are alternatives, not extra steps. If you generate more than one region, give each config its own `mod_id` and `trigger_guid_base`; two gates with the same trigger GUIDs will collide.
+
+## Trigger count
+
+Each module uses one hide trigger, one normal restore per show session, and one creative restore per show session. With the default five vanilla sessions that is 11 per module. Two modules use 22.
+
+One region does not reduce the show session count. The gate must restore the menu in every other session the player can enter. If you have a reason to restore in fewer sessions, set `show_sessions` to the ones you use.
+
+## Manual triggers
+
+Set `"generate_triggers": false` or pass `--skip-triggers`. The generator still writes the Lua scripts, `modinfo.json`, and the provenance file, but it does not write `data/config/export/main/asset/assets.xml`. It writes two files at the mod root instead:
+
+- `menugate.triggers.json`: the trigger list with GUIDs, sessions, scripts, and kinds.
+- `menugate.triggers.xml.txt`: the same triggers as a copy-ready `<ModOps>` snippet.
+
+The trigger GUIDs are still allocated and recorded in `menugate.config.json`. Add the triggers to your own `assets.xml` using those GUIDs, or rename and place the snippet where your mod loads XML. If you change a GUID in the manifest, keep it unique and keep it out of the item list; the Lua scripts do not depend on the trigger GUIDs. Do not leave the `.xml.txt` file where the loader scans `.xml` files; the `.txt` extension keeps it inert.
 
 ## Modules
 

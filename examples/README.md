@@ -30,6 +30,19 @@ Before installing a generated gate, change these fields in the config:
 
 Do not reuse the example GUID bands in a published mod. They are placeholders.
 
+## One region is enough
+
+Pick the config for your host region. You do not need to generate the other three. Each config reads only its own region item list. If you generate gates for more than one region, give each config a different `mod_id` and `trigger_guid_base`.
+
+## Manual triggers
+
+Add `--skip-triggers` to the generator command. It writes the Lua scripts and a manifest at the mod root instead of `assets.xml`:
+
+- `menugate.triggers.json`
+- `menugate.triggers.xml.txt`
+
+Add those triggers to your own XML using the GUIDs in the manifest.
+
 ## The demo
 
 `demo_new_world` is the only example that works without a custom session. It hides the New World tier tabs while you are in the New World, and restores them when you leave. Install it, enter the New World, and check that the three tier tabs are gone and the Streets tab is still there. Then remove it. It is a test, not a playable configuration.

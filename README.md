@@ -4,7 +4,7 @@ A session-scoped construction menu gate for Anno 1800, with a mod scanner and a 
 
 [![CI](https://github.com/Panther-Mughil/Anno_Session_Regions/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Panther-Mughil/Anno_Session_Regions/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0--alpha.1-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.0--alpha.2-orange.svg)](CHANGELOG.md)
 
 ## What this is
 
@@ -22,7 +22,7 @@ The project ships:
 
 ## Status
 
-**Alpha, version 0.1.0-alpha.1.**
+**Alpha, version 0.1.0-alpha.2.**
 
 The gate mechanism has been tested in game for the **New World** in normal and creative saves. The Old World, Arctic, and Enbesa presets are generated from the same vanilla data and pass the local tests, but they have **not been tested in game yet**. The mod scanner is experimental and may miss unusual mod edits.
 
@@ -62,7 +62,7 @@ Python packages are only needed for development. Run `pip install -r requirement
 
 ## Quick start
 
-1. Copy a region config from `examples/` into your mod project. This walkthrough uses `examples/new_world/config.json`.
+1. Copy the one region config that matches your host region from `examples/` into your mod project. You do not need the other three. This walkthrough uses `examples/new_world/config.json`.
 2. Open the config and set these fields:
    - `hide_session.guid`: the GUID of your custom session.
    - `hide_session.name`: a readable name, used in trigger names.
@@ -79,6 +79,7 @@ Python packages are only needed for development. Run `pip install -r requirement
 4. Copy the generated folder and `companions/streets_unified` into the game's mods folder.
 5. Start the game and enter your custom session. The host region's tier tabs should be gone. Leave the session and the normal menu should return with the progress you actually earned.
 6. If you use other mods, run the scanner and generate again with the compatibility list. See [Compatibility](#compatibility).
+7. If you want to add the trigger XML yourself, pass `--skip-triggers`. The generator writes the Lua scripts plus a JSON manifest and a copy-ready XML snippet instead of `assets.xml`.
 
 The four region configs are templates. They hide nothing until you replace the placeholder session GUID. The demo is the only runnable example.
 
@@ -152,6 +153,7 @@ The scanner understands the common ModOp forms: `add`, `addNextSibling`, `addPre
 | `companions/streets_unified` | The required street companion mod. |
 | `examples/` | Configs for each host region, plus a New World demo. |
 | `tests/` | Fixture mods, generator checks, preset checks, and repository checks. |
+| `AGENTS.md` | A step-by-step workflow for an AI coding agent helping a modder. |
 
 ## Compatibility
 
@@ -195,12 +197,13 @@ The presets cover the four vanilla host regions. See `docs/regions.md` for the t
 - `docs/versioning.md`: alpha status, tags, and how updates are shipped.
 - `docs/faq.md`: short answers to common questions.
 - `docs/development.md`: repository layout, tests, and the release checklist.
+- `AGENTS.md`: instructions for an AI coding agent to set up a gate for a modder.
 - `CONTRIBUTING.md`: how to report a bug, suggest a change, or send a pull request.
 - `CHANGELOG.md`: what changed in each version.
 
 ## Versioning
 
-The project follows semantic versioning with pre-release tags. The current version is `0.1.0-alpha.1`. Releases are tagged `v0.1.0-alpha.1` and later. The generated mod carries the toolkit version in its file headers and in `menugate.config.json`, so a generated folder can always be traced back to the tool that made it.
+The project follows semantic versioning with pre-release tags. The current version is `0.1.0-alpha.2`. Releases are tagged `v0.1.0-alpha.2` and later. The generated mod carries the toolkit version in its file headers and in `menugate.config.json`, so a generated folder can always be traced back to the tool that made it.
 
 The version stays in the alpha range until every supported host region has had an in-game pass. See `docs/versioning.md`.
 

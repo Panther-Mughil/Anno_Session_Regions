@@ -16,6 +16,13 @@ def test_examples_leave_the_trigger_guid_base_empty() -> None:
         assert config["trigger_guid_base"] is None, name
 
 
+def test_each_example_uses_its_own_region_item_list() -> None:
+    for name, config in example_configs():
+        region = config["region"]
+        items_file = config["modules"][0]["items_file"]
+        assert f"/{region}_core.json" in items_file.replace("\\", "/"), name
+
+
 def test_example_session_guids_are_distinct() -> None:
     guids = {}
     for name, config in example_configs():

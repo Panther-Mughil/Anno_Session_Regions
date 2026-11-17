@@ -103,6 +103,45 @@ def test_compat_file_adds_a_second_module(tmp_path: Path) -> None:
     assert len(tree.getroot().findall("ModOp")) == 22
 
 
+def test_skip_triggers_writes_a_manual_manifest(tmp_path: Path) -> None:
+    cfg = write_config(tmp_path, config())
+    out = tmp_path / "out"
+    assert generate.main(["--config", str(cfg), "--out", str(out), "--skip-triggers"]) == 0
+    assert not (out / "data/config/export/main/asset/assets.xml").exists()
+    assert (out / "data/script/test_gate_core_hide.lua").exists()
+    manifest = json.loads((out / "menugate.triggers.json").read_text(encoding="utf-8"))
+    assert len(manifest["triggers"]) == 11
+    text = (out / "menugate.triggers.xml.txt").read_text(encoding="utf-8")
+    assert text.count("<ModOp ") == 11
+    ET.fromstring(text)
+    provenance = json.loads((out / "menugate.config.json").read_text(encoding="utf-8"))
+    assert provenance["triggers_generated"] is False
+    assert provenance["trigger_count"] == 11
+
+
+def test_config_can_skip_triggers(tmp_path: Path) -> None:
+    data = config()
+    data["generate_triggers"] = False
+    cfg = write_config(tmp_path, data)
+    out = tmp_path / "out"
+    assert generate.main(["--config", str(cfg), "--out", str(out)]) == 0
+    assert (out / "menugate.triggers.json").exists()
+    assert not (out / "data/config/export/main/asset/assets.xml").exists()
+
+
+def test_enabling_triggers_removes_a_stale_manifest(tmp_path: Path) -> None:
+    data = config()
+    data["generate_triggers"] = False
+    cfg = write_config(tmp_path, data)
+    out = tmp_path / "out"
+    assert generate.main(["--config", str(cfg), "--out", str(out)]) == 0
+    data["generate_triggers"] = True
+    cfg.write_text(json.dumps(data), encoding="utf-8")
+    assert generate.main(["--config", str(cfg), "--out", str(out)]) == 0
+    assert (out / "data/config/export/main/asset/assets.xml").exists()
+    assert not (out / "menugate.triggers.json").exists()
+
+
 def test_empty_trigger_base_is_rejected(tmp_path: Path) -> None:
     data = config()
     data["trigger_guid_base"] = None
