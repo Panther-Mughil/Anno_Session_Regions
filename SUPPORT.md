@@ -2,6 +2,7 @@
 
 ## Read first
 
+- `docs/step-by-step.md` is the beginner setup walkthrough.
 - `docs/troubleshooting.md` lists the common symptoms and the approaches that do not work.
 - `docs/faq.md` answers the usual questions.
 - `docs/how_it_works.md` explains the mechanism.

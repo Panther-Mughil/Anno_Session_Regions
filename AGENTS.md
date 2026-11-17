@@ -11,6 +11,7 @@ The tools are Python 3.10 or newer and use only the standard library. The genera
 ## Read first
 
 - `README.md`: what the project is and the quick start.
+- `docs/step-by-step.md`: the beginner walkthrough. Point the modder here first.
 - `docs/how_it_works.md`: the mechanism, the trigger, and every Lua call.
 - `docs/configuration.md`: every config field.
 - `docs/regions.md`: the four host regions and their tab IDs.
@@ -48,7 +49,7 @@ If the user has no custom session yet, stop. The gate needs a session GUID; it c
 
 ## Hard rules
 
-- Keep the repository single-author. Do not add `Co-Authored-By:` trailers or other co-author lines to commits.
+- Use the project AI co-author line on commits: `Co-Authored-By: Aveline (AI) <358026186+Panther-Aveline@users.noreply.github.com>`. Do not add Claude, Anthropic, or other co-author lines.
 - Never invent a GUID. Ask for the user's free block.
 - Never reuse a trigger base across two generated mods.
 - Never put a vanilla building GUID into the user's own region `BuildingList` or unlock trigger. Reference vanilla GUIDs for products, fertilities, text, and icons, but not for the user's own buildings.

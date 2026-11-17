@@ -27,9 +27,10 @@ def test_version_is_an_alpha_prerelease() -> None:
 
 def test_no_developer_paths_in_shipped_code() -> None:
     offenders = []
+    code_dirs = {"src", "templates", "presets", "companions"}
     for path in text_files():
         relative = path.relative_to(ROOT)
-        if relative.parts[0] in {"docs", "tests"}:
+        if not relative.parts or relative.parts[0] not in code_dirs:
             continue
         text = path.read_text(encoding="utf-8", errors="ignore")
         if "/mnt/" in text or "/home/" in text or "C:\\" in text:

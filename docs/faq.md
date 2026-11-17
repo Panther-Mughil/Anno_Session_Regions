@@ -1,5 +1,9 @@
 # Frequently asked questions
 
+## Where do I start?
+
+Read `docs/step-by-step.md`. It walks through one region, one config, one generated mod, and every parameter.
+
 ## Is this a new region?
 
 No. A new region is not moddable in Anno 1800. The project creates a new session inside an existing region and hides that region's tier tabs while the player is in the session. The region keeps its terrain rules, assets, and population data.
