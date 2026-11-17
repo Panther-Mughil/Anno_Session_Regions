@@ -256,7 +256,11 @@ The generated mod carries the toolkit version in its file headers and in `menuga
 
 **If you publish a mod that uses this project, credit Panther and link to the [Anno_Session_Regions](https://github.com/Panther-Mughil/Anno_Session_Regions) repository.**
 
-*A line in your mod description is enough.* Streets Unified is by Panther and is included under the same license. **[Aveline (AI)](https://github.com/Panther-Aveline)** is the AI assistant that helped build the project. More in [CREDITS.md](CREDITS.md).
+*A line in your mod description is enough.*
+
+Streets Unified is by Panther and is included under the same license.
+
+**[Aveline (AI)](https://github.com/Panther-Aveline)** is the AI assistant that helped build the project. More in [CREDITS.md](CREDITS.md).
 
 Anno 1800 is a trademark of Ubisoft. This project is not affiliated with or endorsed by Ubisoft.
 
