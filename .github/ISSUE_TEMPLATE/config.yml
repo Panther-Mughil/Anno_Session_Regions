@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Troubleshooting guide
+    url: https://github.com/Panther-Mughil/Anno_Session_Regions/blob/main/docs/troubleshooting.md
+    about: Common symptoms, causes, and the approaches that do not work.
+  - name: FAQ
+    url: https://github.com/Panther-Mughil/Anno_Session_Regions/blob/main/docs/faq.md
+    about: Short answers to the usual questions.
+  - name: How it works
+    url: https://github.com/Panther-Mughil/Anno_Session_Regions/blob/main/docs/how_it_works.md
+    about: The full explanation of the gate, the triggers, and the Lua scripts.

@@ -1,0 +1,135 @@
+name: Bug report
+description: Report something that does not work as documented
+title: "[Bug]: "
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read `docs/troubleshooting.md` first. It covers the common symptoms and lists the approaches that do not work.
+
+        Use the latest release. Only the latest version is supported.
+
+  - type: input
+    id: game-version
+    attributes:
+      label: Game version
+      description: The version shown in the game or the mod loader log.
+      placeholder: "GU18.4 (18.4.1412158.165275)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: region
+    attributes:
+      label: Host region
+      options:
+        - New World
+        - Old World
+        - Arctic
+        - Enbesa
+        - Other or not sure
+    validations:
+      required: true
+
+  - type: input
+    id: session-guid
+    attributes:
+      label: Custom session GUID
+      description: The GUID used in hide_session.guid. Leave blank if the problem happens before the gate runs.
+      placeholder: "900000001"
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Describe the result you saw and the result you expected.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the steps that lead to the problem.
+      placeholder: |
+        1. Start a new save
+        2. Enter the custom session
+        3. Open the construction menu
+        4. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: save
+    attributes:
+      label: Save state
+      options:
+        - New save
+        - Existing save
+        - Both
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Game mode
+      options:
+        - Normal
+        - Creative
+        - Both
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: mods
+    attributes:
+      label: Installed mods
+      description: List the mods that were active, or attach the loader log. The full list matters when tabs appear or disappear.
+      placeholder: |
+        Streets Unified 1.0.0
+        Example mod 2.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Generated config
+      description: Paste the config, or attach the generated menugate.config.json.
+      render: json
+
+  - type: textarea
+    id: compat
+    attributes:
+      label: Compatibility list
+      description: If you used the scanner, paste or attach compat.json. Remove personal paths first if you prefer.
+
+  - type: textarea
+    id: loader-log
+    attributes:
+      label: Loader log
+      description: Paste the relevant lines from mod-loader.log, or attach the file. The path is Documents/Anno 1800/log/mod-loader.log inside the Windows or Wine user folder.
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or extra context
+      description: Drag a screenshot here if the problem is visual.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I read docs/troubleshooting.md.
+          required: true
+        - label: I searched the existing issues.
+          required: true
+        - label: I am using the latest release.
+          required: true
+        - label: I can help test a fix.
+          required: false

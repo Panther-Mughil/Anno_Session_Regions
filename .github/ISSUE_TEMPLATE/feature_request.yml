@@ -1,0 +1,67 @@
+name: Feature request
+description: Suggest a new region, tool, or scanner improvement
+title: "[Feature]: "
+labels: ["enhancement", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem first, then the change you want. A request that names the host region and the mods involved is easier to plan.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What can you not do today, or what takes too much manual work?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What should the project do instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you tried or rejected.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Host region preset
+        - Generator
+        - Compatibility scanner
+        - Streets Unified
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: region
+    attributes:
+      label: Host region involved
+      options:
+        - New World
+        - Old World
+        - Arctic
+        - Enbesa
+        - More than one
+        - Not region specific
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched the existing issues.
+          required: true
+        - label: I can help test this change.
+          required: false
