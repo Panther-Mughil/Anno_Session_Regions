@@ -90,6 +90,8 @@ If the scanner misses an item, add it to the module in the config:
 
 `items` is merged with the compatibility list. `keep_unlocked` removes an ID from the lock list and forces it unlocked in every script.
 
+A compatibility module is a full module: it gets the same named restores, generic restore, 500 ms arrival cue, settle trigger and creative variants as the core module. A mod-added item is therefore restored in every session, including a modded session the preset list does not name.
+
 ## Limits
 
 - It cannot follow a mod that builds its XML with a non-standard structure.

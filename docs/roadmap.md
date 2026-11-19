@@ -7,7 +7,7 @@ These are the next pieces of work. They are plans, not promises. If one of them 
 | **Planned** | Suppress notification toasts when unlocking items. |
 | **Planned** | Find better ways to merge streets back into the building tabs. |
 | **Planned** | Add compatibility discovery with more mods. |
-| **In progress** | Compatibility with other modded sessions. |
+| **Done in 0.1.0-alpha.7** | Compatibility with other modded sessions, through the generic restore. |
 
 ## Suppress notification toasts
 
@@ -29,9 +29,9 @@ The scanner knows the common ModOp forms. Published mods use more patterns. The 
 
 ## Compatibility with other modded sessions
 
-Two mods can add sessions or gates. Their triggers, load order, and GUID blocks can overlap. This work is in progress.
+Two mods can add sessions or gates. Their triggers, load order, and GUID blocks can overlap.
 
-**Done when:** the project has rules for running next to another session mod, a test for overlapping triggers, and an in-game report.
+**Done in 0.1.0-alpha.7.** A save that loads into a modded session the preset list does not name is covered by the generic restore: `ConditionActiveSession` on the hidden session with `SessionBlacklist 1`, plus a 500 ms arrival cue and a one-shot settle trigger. The trigger GUID collision check stops a gate from reusing an item GUID, and `--compat` gives each group of installed mods its own module. An in-game report from another session mod is still welcome.
 
 ## Suggest a roadmap item
 

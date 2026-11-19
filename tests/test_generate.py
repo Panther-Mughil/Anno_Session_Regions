@@ -69,7 +69,7 @@ def test_generate_writes_a_complete_mod(tmp_path: Path) -> None:
     assert modinfo["ModName"]["German"] is None
 
     tree = ET.parse(out / "data/config/export/main/asset/assets.xml")
-    assert len(tree.getroot().findall("ModOp")) == 11
+    assert len(tree.getroot().findall("ModOp")) == 16
 
     hide = (out / "data/script/test_gate_core_hide.lua").read_text(encoding="utf-8")
     assert "101254" in hide and "101257" in hide
@@ -100,7 +100,7 @@ def test_compat_file_adds_a_second_module(tmp_path: Path) -> None:
     assert generate.main(["--config", str(cfg), "--compat", str(compat), "--out", str(out)]) == 0
     assert (out / "data/script/test_gate_compat_hide.lua").exists()
     tree = ET.parse(out / "data/config/export/main/asset/assets.xml")
-    assert len(tree.getroot().findall("ModOp")) == 22
+    assert len(tree.getroot().findall("ModOp")) == 32
 
 
 def test_skip_triggers_writes_a_manual_manifest(tmp_path: Path) -> None:
@@ -110,13 +110,13 @@ def test_skip_triggers_writes_a_manual_manifest(tmp_path: Path) -> None:
     assert not (out / "data/config/export/main/asset/assets.xml").exists()
     assert (out / "data/script/test_gate_core_hide.lua").exists()
     manifest = json.loads((out / "menugate.triggers.json").read_text(encoding="utf-8"))
-    assert len(manifest["triggers"]) == 11
+    assert len(manifest["triggers"]) == 16
     text = (out / "menugate.triggers.xml.txt").read_text(encoding="utf-8")
-    assert text.count("<ModOp ") == 11
+    assert text.count("<ModOp ") == 16
     ET.fromstring(text)
     provenance = json.loads((out / "menugate.config.json").read_text(encoding="utf-8"))
     assert provenance["triggers_generated"] is False
-    assert provenance["trigger_count"] == 11
+    assert provenance["trigger_count"] == 16
 
 
 def test_config_can_skip_triggers(tmp_path: Path) -> None:
@@ -181,3 +181,65 @@ def test_trigger_guid_cannot_collide_with_an_item(tmp_path: Path) -> None:
             None,
             False,
         )
+
+
+def test_generated_engine_has_generic_settle_and_logging(tmp_path: Path) -> None:
+    cfg = write_config(tmp_path, config())
+    out = tmp_path / "out"
+    assert generate.main(["--config", str(cfg), "--out", str(out)]) == 0
+
+    tree = ET.parse(out / "data/config/export/main/asset/assets.xml")
+    ops = tree.getroot().findall("ModOp")
+
+    def values(op):
+        return op.find("Asset/Values")
+
+    # Generic restore: ConditionActiveSession + SessionBlacklist 1, plus a
+    # delayed ActionUnlockAsset on the settle flag.
+    generic = [
+        op for op in ops
+        if values(op).find("Trigger/TriggerCondition/Template") is not None
+        and values(op).findtext("Trigger/TriggerCondition/Template") == "ConditionActiveSession"
+        and values(op).findtext("Trigger/TriggerCondition/Values/ConditionActiveSession/SessionBlacklist") == "1"
+    ]
+    assert len(generic) == 2  # normal and creative
+    delayed = generic[0].find(".//ActionDelayedActions")
+    assert delayed is not None
+    assert delayed.findtext("ExecutionDelay") == "500"
+    assert delayed.findtext(".//ActionUnlockAsset/UnlockAssets/Item/Asset")
+
+    # Settle: ConditionUnlocked on the flag, with the hidden-session guard.
+    settle = [op for op in ops if values(op).findtext("Trigger/TriggerCondition/Template") == "ConditionUnlocked"]
+    assert len(settle) == 2
+    for op in settle:
+        assert op.findtext(".//ActionLockAsset/LockAssets/Item/Asset") == values(op).findtext(
+            "Trigger/TriggerCondition/Values/ConditionUnlocked/UnlockNeeded"
+        )
+        assert op.findtext(".//SubTriggers//ConditionActiveSession/SessionBlacklist") == "1"
+        assert op.findtext(".//SubTriggers//TriggerCondition/Template") == "ConditionIsCreativeMode"
+    # Normal settle is negated creative; the second settle is positive creative.
+    assert settle[0].findtext(".//NegateCondition") == "1"
+    assert settle[1].findtext(".//NegateCondition") is None
+
+    # Marker v2, the lookup-failure rule and the log block live in the scripts.
+    show = (out / "data/script/test_gate_core_show.lua").read_text(encoding="utf-8")
+    for needle in ("v2|", "marker_valid(MARKER, SIG, MARKER_AGE)", "if not qok then", "reg_ok[tt] == true", "gate_log("):
+        assert needle in show
+    for name in ("hide", "show", "creative"):
+        script = (out / "data/script" / f"test_gate_core_{name}.lua").read_text(encoding="utf-8")
+        assert "logs/menugate_debug.off" in script
+        assert "pcall(function() return os.time() end)" in script
+
+
+def test_creative_off_gates_the_hide_to_non_creative(tmp_path: Path) -> None:
+    data = config()
+    data["creative_restore"] = False
+    cfg = write_config(tmp_path, data)
+    out = tmp_path / "out"
+    assert generate.main(["--config", str(cfg), "--out", str(out)]) == 0
+    assert not (out / "data/script/test_gate_core_creative.lua").exists()
+    tree = ET.parse(out / "data/config/export/main/asset/assets.xml")
+    assert len(tree.getroot().findall("ModOp")) == 9
+    hide = tree.getroot().findall("ModOp")[0]
+    assert hide.find(".//ConditionIsCreativeMode") is not None
+    assert hide.findtext(".//NegateCondition") == "1"

@@ -36,7 +36,7 @@ A mod that changes unlock state always carries some risk. Make a backup before t
 
 Yes. Remove the gate folder and Streets Unified from the mods folder. If the game is saved while inside the custom session, the vanilla menu may be missing until the show script runs in another session, so leave the session before uninstalling.
 
-If a marker file is left behind, delete `logs/<prefix>_<module>.restore` in the game's working folder.
+If a marker file is left behind, delete `logs/<prefix>_<module>.restore` and `logs/<prefix>_<module>.restore_creative` in the game's working folder. A marker with a different signature or one older than `marker_max_age_seconds` (6 hours by default) is ignored anyway.
 
 ## Why does the restore re-register triggers instead of unlocking items?
 

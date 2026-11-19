@@ -53,7 +53,7 @@ If the user has no custom session yet, stop. The gate needs a session GUID; it c
 - Never invent a GUID. Ask for the user's free block.
 - Never reuse a trigger base across two generated mods.
 - Never put a vanilla building GUID into the user's own region `BuildingList` or unlock trigger. Reference vanilla GUIDs for products, fertilities, text, and icons, but not for the user's own buildings.
-- Do not edit generated Lua or XML by hand. Change the config or the templates and regenerate.
+- Do not edit generated Lua or XML by hand. Change the config or `src/generate.py` and regenerate.
 - Do not edit the game install outside its `mods` folder and the game's own logs.
 - Do not overwrite the user's files without a backup. If a file would be replaced, copy it next to the original first.
 - Do not run destructive git commands.
@@ -186,15 +186,19 @@ If the tabs are still visible, read `docs/troubleshooting.md` before changing an
 
 ## How many trigger GUIDs are allocated
 
-Each module uses:
+Each module uses, with `N` show sessions:
 
 ```
-1 hide + 1 normal restore per show session + 1 creative restore per show session
+1 hide + N named restores + N named creative restores + 1 generic restore + 1 creative generic + 1 settle flag + 1 settle + 1 creative settle
 ```
 
-**One custom session with one core module and the default five show sessions uses 11 trigger GUIDs.** Without creative restore it uses 6. With a compatibility module it uses 22, or 12 without creative. The demo hides the New World inside the New World, so it has four show sessions and uses 9.
+That is `2N + 6` with creative restore and `N + 4` without it.
 
-One region does not reduce the show session count. The gate must restore the menu in every other session the player can enter. If the user has a reason to restore in fewer sessions, they can set `show_sessions` to the sessions they use, but leaving one out means the menu will not restore there.
+**One custom session with one core module and the default five show sessions uses 16 trigger GUIDs.** Without creative restore it uses 9. With a compatibility module it uses 32, or 18 without creative. The demo hides the New World inside the New World, so it has four show sessions and uses 14 (8 without creative).
+
+One region does not reduce the show session count. The gate must restore the menu in every other session the player can enter. If the user has a reason to restore in fewer sessions, they can set `show_sessions` to the sessions they use, but leaving one out means the menu will not restore there; the generic restore still covers it.
+
+The scripts write `logs/<prefix>.log` (rotated to `.prev.log` at 256 KB, cursor at `.cursor`) relative to the game's working folder. Create `logs/menugate_debug.off` to silence it. The log is display only and never changes an unlock.
 
 ## Multi-region use
 

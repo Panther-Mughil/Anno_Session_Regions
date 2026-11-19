@@ -26,7 +26,7 @@ Before installing a generated gate, change these fields in the config:
 
 - `hide_session.guid` and `hide_session.name`: your session.
 - `mod_id`, `mod_name`, `creator`, and `version`: your mod's values.
-- `trigger_guid_base`: the first of the eleven GUIDs the gate will define. The examples leave it `null` on purpose. Fill it with the first free GUID in your own range, or pass `--guid-base`. The generator stops until it is set.
+- `trigger_guid_base`: the first of the sixteen GUIDs the gate will define (nine without creative restore). The examples leave it `null` on purpose. Fill it with the first free GUID in your own range, or pass `--guid-base`. The generator stops until it is set.
 - `script_prefix`: a short prefix for the Lua file names.
 - `output`: optional. The default is `out/<mod_id>` next to the config.
 

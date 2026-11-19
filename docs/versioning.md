@@ -2,7 +2,7 @@
 
 ## Current version
 
-`0.1.0-alpha.6`, tagged `v0.1.0-alpha.6`.
+`0.1.0-alpha.7`, tagged `v0.1.0-alpha.7`.
 
 Alpha means:
 
@@ -36,7 +36,8 @@ v0.1.0-alpha.3
 v0.1.0-alpha.4
 v0.1.0-alpha.5
 v0.1.0-alpha.6
-v0.1.1-alpha.7
+v0.1.0-alpha.7
+v0.1.1-alpha.8
 v0.2.0-alpha.1
 ```
 
@@ -51,8 +52,11 @@ Every generated file starts with the toolkit version. `menugate.config.json` als
 - the preset file name;
 - the hide and show sessions;
 - the module counts and trigger GUIDs;
+- the full trigger list, including the generic, settle and creative variants;
 - the config itself;
 - a SHA-256 hash of the resolved inputs.
+
+The runtime log under `logs/` is created by the game, not by the generator, so it is never part of a generated folder or a release archive.
 
 The hash makes it possible to tell whether two generated folders came from the same inputs. The generated folder does not call the toolkit at runtime.
 

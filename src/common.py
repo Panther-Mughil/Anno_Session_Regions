@@ -12,7 +12,6 @@ from version import __version__
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PRESETS_DIR = REPO_ROOT / "presets"
 ITEMS_DIR = PRESETS_DIR / "items"
-TEMPLATES_DIR = REPO_ROOT / "templates"
 
 PRESET_REQUIRED = (
     "schema_version",

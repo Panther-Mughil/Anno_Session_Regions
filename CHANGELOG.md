@@ -4,6 +4,38 @@ All notable changes to this project are listed here. The format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.0-alpha.7] - 2026-11-20
+
+### Added
+
+- The generator now emits the hardened session-gate engine:
+  - a generic restore trigger conditioned on the hidden session with `SessionBlacklist 1`, covering sessions the config does not name;
+  - an `ActionDelayedActions` arrival cue 500 ms after the generic restore;
+  - a locked `FeatureUnlock` flag and a one-shot settle trigger per mode, session-gated so a pending cue cannot run inside the custom session;
+  - creative variants of the named, generic and settle triggers.
+- v2 restore markers: `v2|<signature>|<os.time>`, written only when every item succeeded, valid for `marker_max_age_seconds` (6 hours), and overwritten with an invalidated stamp when removal fails.
+- A rotated runtime log at `logs/<prefix>.log` with `logs/<prefix>.prev.log`, a temp-and-rename dedupe cursor, a dedupe key that includes `failed=`, and every `io`/`os` call inside `pcall`.
+- Config fields `session_enter_delay_ms`, `marker_max_age_seconds`, `log_file`, `log_backup`, `log_cursor`, `log_rotate_bytes`, `log_dedupe_seconds`, `known_sessions`, `load_after`, and the per-module `guid_base` and `guids`.
+- A failed `GetUnlockTriggerForAsset` pcall is now a failure and never a direct unlock. Success is counted only for a trigger the run registered.
+
+### Changed
+
+- `templates/` is removed. The Lua and XML shapes are emitted from `src/generate.py` so the engine has one source of truth.
+- Trigger GUIDs per module are now `2N + 6` with creative restore and `N + 4` without it. One module with the default five show sessions uses 16 GUIDs (9 without creative); two modules use 32 (18).
+- Module item order is preserved (leaves, nested submenus, tab categories) instead of sorted.
+- All outputs are staged as `.tmp` and renamed only after every output has been generated.
+- Documentation covers the generic restore, the settle cue, marker v2, the runtime log, and co-op as a known limitation.
+
+### Fixed
+
+- GUID allocation runs one collision check across every sequential and pinned GUID, a duplicate module key, and item GUIDs before writing anything.
+- `creative_restore=false` gates the hide trigger to non-creative, so a creative save cannot hide the tabs with no way back.
+
+### Tested
+
+- The pytest suite passes, including `tests/check_generated.py` and the engine-invariant tests.
+- All five examples are regenerated and pass the XSD shape gate and `luac`.
+
 ## [0.1.0-alpha.6] - 2026-11-18
 
 ### Changed

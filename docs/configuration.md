@@ -20,11 +20,20 @@ The generator reads one JSON file. The examples under `examples/` are complete c
 | `show_sessions` | No | A list of sessions where the menu is restored. Default: every vanilla session except the hide session. |
 | `trigger_guid_base` | Yes | The first of the trigger GUIDs. No default; the examples use `null`. The generator stops until it is set, or until `--guid-base` is passed. |
 | `script_prefix` | Yes | The prefix for the generated Lua file names. |
-| `marker_dir` | No | The folder for the restore marker. Default `logs`. |
-| `creative_restore` | No | Generate the creative scripts. Default `true`. |
+| `marker_dir` | No | The folder for the restore markers and the runtime log. Default `logs`. |
+| `marker_max_age_seconds` | No | How long a restore marker stays valid. Default `21600` (6 hours). Must be positive. |
+| `session_enter_delay_ms` | No | The generic restore's arrival cue, in milliseconds. Default `500`. |
+| `creative_restore` | No | Generate the creative scripts and creative triggers. Default `true`. |
 | `generate_triggers` | No | Write the trigger XML. Default `true`. Set to `false` to write a manual trigger manifest instead. |
+| `log_file` | No | The runtime log path, relative to the game's working folder. Default `<marker_dir>/<script_prefix>.log`. |
+| `log_backup` | No | The rotated log path. Default replaces `.log` with `.prev.log`. |
+| `log_cursor` | No | The dedupe cursor path. Default replaces `.log` with `.cursor`. |
+| `log_rotate_bytes` | No | Rotate the log at this size. Default `262144` (256 KB). |
+| `log_dedupe_seconds` | No | Suppress an identical log line inside this window. Default `60`. `0` disables dedupe. |
+| `known_sessions` | No | A list of `{ "guid", "name", "region"?, "region_name"? }` used for log labels only. It never creates a trigger. Default: `presets/sessions.json` plus `hide_session`. |
 | `streets_unified` | No | `{ "required": true }` adds the Streets Unified dependency. Default `true`. |
 | `dependencies` | No | Extra ModIDs added to `ModDependencies` and `LoadAfterIds`. |
+| `load_after` | No | Extra ModIDs added to `LoadAfterIds` only. |
 | `known_issues` | No | A list written to `KnownIssues` in `modinfo.json`. |
 | `output` | No | The output folder, relative to the config. Default `out/<mod_id>`. |
 | `modules` | Yes | One or more modules. See below. |
@@ -50,13 +59,15 @@ Leave it out to use every session in `presets/sessions.json` except the hide ses
 
 ### trigger_guid_base
 
-Each module uses:
+Each module uses, with `N` show sessions:
 
 - 1 GUID for the hide trigger;
-- 1 GUID per show session for the normal restore;
-- 1 GUID per show session for the creative restore, when creative restore is on.
+- `N` GUIDs for the named restore triggers;
+- `N` GUIDs for the named creative restore triggers, when creative restore is on;
+- 1 GUID for the generic restore trigger, plus 1 for its creative twin;
+- 1 GUID for the settle flag, 1 for the settle trigger and 1 for its creative twin.
 
-With five vanilla sessions, one module uses 11 GUIDs. Two modules use 22. The generator checks that no trigger GUID is also an item GUID.
+That is `2N + 6` with creative restore, or `N + 4` without it. With the default five show sessions, one module uses 16 GUIDs (9 without creative). Two modules use 32 (18 without creative). The generator checks that no trigger GUID is also an item GUID.
 
 Use a free block in your own GUID range. The examples set this to `null` on purpose because the toolkit does not own a range. The generator stops with an error until you fill it, or pass `--guid-base` on the command line. The generator cannot check a band against vanilla or against other installed mods.
 
@@ -64,9 +75,9 @@ One config generates one gate for one host region. The other example configs are
 
 ## Trigger count
 
-Each module uses one hide trigger, one normal restore per show session, and one creative restore per show session. With the default five vanilla sessions that is 11 per module. Two modules use 22.
+Each module uses one hide trigger, one named restore and one named creative restore per show session, one generic restore and creative generic, one settle flag, and one settle trigger and creative settle. With the default five show sessions that is 16 per module. Two modules use 32.
 
-For **one custom session with one core module and the default settings, the answer is 11 trigger GUIDs.** Without creative restore it is 6. With a compatibility module it is 22 (or 12 without creative). If the hide session is one of the five vanilla sessions, there are four show sessions, so the count is 9 (or 5 without creative).
+For **one custom session with one core module and the default settings, the answer is 16 trigger GUIDs.** Without creative restore it is 9. With a compatibility module it is 32 (or 18 without creative). If the hide session is one of the five vanilla sessions, there are four show sessions, so the count is 14 (or 8 without creative).
 
 The item GUIDs in the lock lists are vanilla IDs. The gate defines only new trigger assets. The Streets Unified companion uses fixed IDs 2001229950 to 2001229954 and does not consume your block.
 
@@ -94,6 +105,10 @@ The trigger GUIDs are still allocated and recorded in `menugate.config.json`. Ad
 | `keep_unlocked` | No | GUIDs removed from the lock list and force-unlocked in every script. Default: the preset's street buildings. |
 | `exclude` | No | GUIDs removed from the lock list without forcing them unlocked. |
 | `creative_restore` | No | Override the top-level creative setting for this module. |
+| `guid_base` | No | Pin this module's first sequential trigger GUID. Default: continue from the previous module's cursor. |
+| `guids` | No | Pin individual triggers: `hide`, `generic_restore`, `generic_restore_creative`, `settle_flag`, `settle_restore`, `settle_restore_creative`. An unknown slot is an error. |
+
+The generator allocates every sequential GUID and every pinned GUID through one collision check before it writes anything. A collision, a duplicate module key, or a trigger GUID that is also an item GUID stops the run with nothing written.
 
 Example:
 
@@ -140,9 +155,13 @@ data/script/<prefix>_<module>_creative.lua
 menugate.config.json
 ```
 
-`menugate.config.json` is a record of the inputs and the allocated GUIDs. The game does not read it.
+`menugate.config.json` is a record of the inputs, the allocated GUIDs and the trigger list. The game does not read it.
 
-Do not edit the generated files by hand. Change the config or the templates and regenerate.
+The scripts also write runtime files beside the game's other logs, relative to the game's working folder: `logs/<prefix>.log`, `logs/<prefix>.prev.log`, `logs/<prefix>.cursor`, and the two restore markers `logs/<prefix>_<module>.restore` and `logs/<prefix>_<module>.restore_creative`. Create `logs/menugate_debug.off` to silence the log.
+
+The generator stages every output as `<file>.tmp` and renames them into place only after all of them are generated, so an interrupted run cannot pair new scripts with old XML.
+
+Do not edit the generated files by hand. Change the config or `src/generate.py` and regenerate.
 
 ## A complete config
 

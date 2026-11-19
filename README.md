@@ -4,7 +4,7 @@ A session-scoped construction menu gate for Anno 1800, with a mod scanner and a 
 
 [![CI](https://github.com/Panther-Mughil/Anno_Session_Regions/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Panther-Mughil/Anno_Session_Regions/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0--alpha.6-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.0--alpha.7-orange.svg)](CHANGELOG.md)
 
 > **New to the project? Read the [step-by-step setup guide](docs/step-by-step.md) first.** It walks through one region, one config, and one generated mod in plain English.
 
@@ -25,7 +25,7 @@ Anno 1800 builds the construction menu from the **region**, not from the **sessi
 
 ## Status
 
-**Alpha, version `0.1.0-alpha.6`.**
+**Alpha, version `0.1.0-alpha.7`.**
 
 The gate mechanism has been tested in game for the **New World** in normal and creative saves. The Old World, Arctic, and Enbesa presets are generated from the same vanilla data and pass the local tests, but they **have not been tested in game yet**. The compatibility scanner is **experimental**.
 
@@ -53,10 +53,13 @@ The details and the done criteria are in [docs/roadmap.md](docs/roadmap.md).
 
 - Hides the host region's **tier tabs** inside one custom session.
 - Restores the game's **own progression rules** in every other session.
+- Covers sessions the config does not name with a **generic restore**, a 500 ms **arrival cue** and a one-shot **settle trigger**.
 - Keeps **streets available** through the Streets Unified companion.
 - Generates a separate **compatibility module** for mod-added items.
 - Can **skip the trigger XML** and write a manual trigger manifest instead.
-- Records the **trigger range and config hash** in the generated output.
+- Records the **trigger range, trigger list and config hash** in the generated output.
+- Writes a **rotated runtime log** with per-key dedupe, and retries a partial restore instead of latching it.
+- Documents **co-op as a known limitation**: partners in different sessions request opposite states.
 
 ## What it does not do
 
@@ -122,8 +125,7 @@ So the gate hides a tab by locking every building in it. The reverse also matter
 | `src/extract_tier_menu.py` | Reads the game's `assets.xml` and writes an item list. |
 | `src/discover_regions.py` | Drafts presets after a game update. |
 | `src/scan_mods.py` | Finds what installed mods add to the host tier tabs. **Experimental.** |
-| `src/generate.py` | Writes the gate mod from a config, a preset, and an optional compatibility list. |
-| `templates/*.lua` and `templates/*.xml` | The generated scripts and trigger shapes. |
+| `src/generate.py` | Writes the gate mod from a config, a preset, and an optional compatibility list. It also holds the emitted Lua and XML shapes. |
 | `companions/streets_unified` | The required street companion. |
 | `examples/` | A config per region, plus a New World demo. |
 | `tests/` | Fixture mods, generator checks, preset checks, and repository checks. |
@@ -133,10 +135,11 @@ So the gate hides a tab by locking every building in it. The reverse also matter
 1. `src/extract_tier_menu.py` lists the host region's tier tabs. For the New World, that is 101 leaves (99 buildings and 2 streets), 8 nested submenus, and 3 tab categories, for **112 items**.
 2. Two of those are the New World streets, `101308` and `101309`. The generator moves them to the **keep-unlocked** list, leaving **110 items to lock**.
 3. Entering the custom session runs `hide.lua`, which locks all 110 items. The three tabs have nothing available, so they disappear.
-4. Leaving the session runs `show.lua`. It does **not** hand out unlocks. It asks the game which trigger normally grants each item, then registers those triggers again. The game recalculates what the player earned.
-5. A marker file makes the restore one-shot per visit. The hide script deletes it, so the next visit restores again.
-6. Creative mode has no progression. A separate script unlocks the items directly.
+4. Leaving the session runs `show.lua`. It does **not** hand out unlocks. It asks the game which trigger normally grants each item, then registers those triggers again. The game recalculates what the player earned. A failed lookup is a failure, never a direct unlock.
+5. A v2 marker (signature + timestamp, valid for 6 hours) makes the restore one-shot per visit. It is written only when every item succeeded, so a partial restore retries. The hide script deletes both markers, so the next visit restores again.
+6. Creative mode has no progression. A separate script unlocks the items directly, once per visit.
 7. The trigger re-checks every **2 seconds**, so a save that loads directly into the session, or a save made before the mod existed, still gets the right state.
+8. A generic trigger covers any session the config does not name. Its 500 ms arrival cue unlocks a settle flag, and a settle trigger runs the same restore script in the session the player actually reached.
 
 The full trigger and Lua explanation is in [docs/how_it_works.md](docs/how_it_works.md).
 
@@ -248,7 +251,7 @@ A custom session inside **Cape Trelawney** uses the `old_world` preset. The tab 
 
 ## Versioning
 
-The project follows **semantic versioning** with pre-release tags. The current version is **`0.1.0-alpha.6`**. Releases are tagged `v0.1.0-alpha.6` and later.
+The project follows **semantic versioning** with pre-release tags. The current version is **`0.1.0-alpha.7`**. Releases are tagged `v0.1.0-alpha.7` and later.
 
 The generated mod carries the toolkit version in its file headers and in `menugate.config.json`, so a generated folder can always be traced back to the tool that made it. The version stays in the alpha range until every supported host region has had an in-game pass. See [docs/versioning.md](docs/versioning.md).
 

@@ -57,10 +57,10 @@ The gate defines new trigger assets. They need GUIDs that no other mod uses.
 1. Open the GUID list or registry for your mod.
 2. Find a free block in your own range.
 3. Use the **first free ID** as `trigger_guid_base`.
-4. Leave enough room. One region with one module uses **11** IDs with the default five show sessions. Two modules use **22**.
+4. Leave enough room. One region with one module uses **16** IDs with the default five show sessions. Two modules use **32**.
 5. Do not reuse a block that another generated gate uses.
 
-For example, if your block is `2001202271` to `2001202399`, use `2001202271` as the base. A core plus a compatibility module would use `2001202271` to `2001202292`.
+For example, if your block is `2001202271` to `2001202399`, use `2001202271` as the base. A core plus a compatibility module would use `2001202271` to `2001202302`.
 
 Do not use `900000100` or `900000500`. Those are example placeholders.
 
@@ -111,7 +111,7 @@ Only add `show_sessions` if you have a specific reason to limit the restore. Lea
 |---|---|
 | `trigger_guid_base` | The first free ID from step 3. **This must not be empty.** |
 | `script_prefix` | A short prefix for the Lua files, for example `my_gate`. |
-| `marker_dir` | Leave it as `logs`. The game writes the restore marker there. |
+| `marker_dir` | Leave it as `logs`. The game writes the restore markers and the runtime log there. |
 | `creative_restore` | Leave it as `true` unless you do not want creative mode handled. |
 | `generate_triggers` | Leave it as `true` for normal use. Set it to `false` if you want to add the triggers yourself later. |
 
@@ -221,7 +221,8 @@ The generated folder contains:
 | `data/script/<prefix>_<module>_hide.lua` | Locks the items in your custom session. |
 | `data/script/<prefix>_<module>_show.lua` | Restores the game's normal rules outside it. |
 | `data/script/<prefix>_<module>_creative.lua` | Handles creative mode. |
-| `menugate.config.json` | A record of the config, item counts, and trigger GUIDs. |
+| `menugate.config.json` | A record of the config, item counts, trigger GUIDs and trigger list. |
+| `logs/<prefix>.log` | Written at runtime next to the game's logs; rotates at 256 KB. Not generated with the mod. |
 
 Do not edit the generated files by hand. Change the config and generate again.
 
@@ -287,13 +288,13 @@ For **one custom session**, one host region, and the default five show sessions:
 
 | Setting | Trigger GUIDs |
 |---|---|
-| Core module, creative on | **11** |
-| Core module, creative off | **6** |
-| Core module plus a compatibility module, creative on | **22** |
-| Core module plus a compatibility module, creative off | **12** |
-| Demo that hides the New World in the New World | **9** |
+| Core module, creative on | **16** |
+| Core module, creative off | **9** |
+| Core module plus a compatibility module, creative on | **32** |
+| Core module plus a compatibility module, creative off | **18** |
+| Demo that hides the New World in the New World | **14** |
 
-The formula per module is `1 hide + N normal restores + N creative restores`, where N is the number of show sessions. One custom session does not need the other three regions.
+The formula per module is `2N + 6` with creative restore and `N + 4` without, where N is the number of show sessions. One custom session does not need the other three regions.
 
 The gate defines only trigger assets. The item GUIDs in the lists are vanilla IDs. The Streets Unified companion uses fixed IDs 2001229950 to 2001229954 and does not use your block.
 
@@ -313,11 +314,17 @@ The gate defines only trigger assets. The item GUIDs in the lists are vanilla ID
 | `show_sessions` | No | Sessions where the menu is restored. Default: all vanilla sessions except the hide session. |
 | `trigger_guid_base` | Yes | The first trigger GUID. No default. |
 | `script_prefix` | Yes | The Lua file prefix. |
-| `marker_dir` | No | The restore marker folder. Default `logs`. |
+| `marker_dir` | No | The restore marker and runtime log folder. Default `logs`. |
+| `marker_max_age_seconds` | No | How long a restore marker stays valid. Default `21600` (6 hours). |
+| `session_enter_delay_ms` | No | The generic restore's arrival cue. Default `500`. |
+| `log_file`, `log_backup`, `log_cursor` | No | Override the runtime log paths. |
+| `log_rotate_bytes`, `log_dedupe_seconds` | No | Log rotation size and dedupe window. Defaults `262144` and `60`. |
+| `known_sessions` | No | Session names for log labels only. Never creates a trigger. |
 | `creative_restore` | No | Generate the creative scripts. Default `true`. |
 | `generate_triggers` | No | Write the trigger XML. Default `true`. |
 | `streets_unified` | No | Require the Streets Unified companion. Default `true`. |
 | `dependencies` | No | Extra ModIDs to load after. |
+| `load_after` | No | Extra ModIDs added to `LoadAfterIds` only. |
 | `known_issues` | No | Known issues shown in the mod list. |
 | `output` | No | Output folder. Default `out/<mod_id>`. |
 | `modules` | Yes | One or more item lists and their scripts. |
@@ -335,6 +342,8 @@ The gate defines only trigger assets. The item GUIDs in the lists are vanilla ID
 | `keep_unlocked` | No | GUIDs removed from the lock list and always unlocked. |
 | `exclude` | No | GUIDs removed from the lock list without forcing them unlocked. |
 | `creative_restore` | No | Override the top-level creative setting for this module. |
+| `guid_base` | No | Pin the module's first sequential trigger GUID. |
+| `guids` | No | Pin individual trigger slots: `hide`, `generic_restore`, `generic_restore_creative`, `settle_flag`, `settle_restore`, `settle_restore_creative`. |
 
 ## All generator commands
 
@@ -355,9 +364,13 @@ The gate defines only trigger assets. The item GUIDs in the lists are vanilla ID
 - Allocate trigger GUIDs and refuse collisions with item GUIDs.
 - Keep street buildings unlocked.
 - Generate normal, creative, and hide scripts.
+- Cover sessions the config does not name with a generic restore, its 500 ms arrival cue, and a one-shot settle trigger.
+- Keep a one-shot restore per visit with v2 markers that expire after 6 hours and retry a partial restore.
+- Write a rotated runtime log with per-key dedupe and no file API call outside `pcall`.
 - Add the Streets Unified dependency.
-- Write a provenance file with the config hash and trigger range.
+- Write a provenance file with the config hash, trigger range and trigger list.
 - Write a manual trigger manifest when you skip the trigger XML.
+- Stage every output as `.tmp` and rename it into place only after all outputs exist.
 - Produce the same output for the same inputs.
 
 ## What it cannot do

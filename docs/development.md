@@ -4,13 +4,15 @@
 
 ```
 src/            the four command line tools and shared helpers
-templates/      the Lua and XML shapes used by the generator
+                (generate.py also holds the emitted Lua and XML shapes)
 presets/        one JSON file per host region, plus generated item lists
 examples/       a config per region and a New World demo
 companions/     Streets Unified, shipped as a separate mod
 tests/          pytest suite and fixture data
 docs/           the guide
 ```
+
+The generator emits its Lua and XML from string constants in `src/generate.py`, not from separate template files. That keeps the engine in one place: the log block, the restore loop, the marker format, the trigger shapes and the GUID allocation cannot drift from each other.
 
 ## Setup
 
@@ -35,7 +37,7 @@ The tests skip the Lua check when `luac` is not on the path. CI installs Lua so 
 The suite covers:
 
 - `test_extract.py`: the extractor with a small vanilla-like fixture.
-- `test_generate.py`: a complete generated mod, deterministic output, compatibility modules, GUID collision checks, and Lua syntax.
+- `test_generate.py`: a complete generated mod, deterministic output, compatibility modules, GUID collision checks, Lua syntax, and the engine invariants (generic restore + 500 ms cue, settle flag, marker v2, the failed-lookup rule, and creative-off gating).
 - `test_presets.py`: the four shipped presets and item lists against expected counts.
 - `test_scan_mods.py`: fixture mods, duplicate ModIDs, disabled mods, new tabs, nested categories, and removals.
 - `test_repo_hygiene.py`: version format, no developer paths in shipped code, no private project names in the public repository.
@@ -90,7 +92,7 @@ Scanner tests build small mod trees in a temporary folder. When you add a new Mo
 - Keep command line output short; put detail in the JSON report.
 - No absolute paths in shipped code.
 - No private mod names, private GUID bands, or personal paths in the repository. The hygiene test enforces the last two points.
-- Generated files are not edited by hand. Change the template and regenerate.
+- Generated files are not edited by hand. Change the generator and regenerate.
 
 ## Release
 

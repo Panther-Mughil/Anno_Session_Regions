@@ -67,10 +67,14 @@ An XML trigger cannot run logic. It can say "when this condition holds, run this
 Each module gets:
 
 - one hide trigger for the custom session;
-- one restore trigger for every other session, with a negated creative-mode subtrigger;
-- one creative trigger for every other session, with a positive creative-mode subtrigger.
+- one restore trigger for every show session, with a negated creative-mode subtrigger;
+- one creative restore trigger for every show session, with a positive creative-mode subtrigger;
+- one generic restore trigger, conditioned on "the active session is not the custom session" with `SessionBlacklist 1`, that also schedules a delayed unlock cue after 500 ms;
+- one generic creative restore trigger of the same shape;
+- one locked `FeatureUnlock` flag;
+- one settle trigger per mode, conditioned on that flag being unlocked.
 
-The shape of one trigger:
+The shape of one state trigger (the hide and named restore triggers):
 
 ```xml
 <ModOp Type="addNextSibling" GUID="130248">
@@ -130,14 +134,30 @@ The 2 second check solves two cases:
 
 An early version used the `SessionEnter` event. That event fires once, so it never ran on those saves, and the tabs stayed visible. `ConditionActiveSession` is a level condition, so it is true whenever the session is active.
 
+### The generic restore and the arrival cue
+
+The named restore triggers cover the show sessions in `presets/sessions.json`. A save can also load into a modded session the preset list does not name. A second, generic trigger covers every session the list omits: it uses the same `ConditionActiveSession` template with the custom session GUID plus `<SessionBlacklist>1</SessionBlacklist>`, which means "every session except this one".
+
+The generic trigger also carries an `ActionDelayedActions` with `<ExecutionDelay>500</ExecutionDelay>`. Half a second after the trigger fires, that action unlocks the module's settle flag in whatever session is active then. A separate settle trigger watches the flag with `ConditionUnlocked`; when the delayed action unlocks it, the settle trigger runs the same restore script and then locks the flag again with `ActionLockAsset`, so the cue is one-shot and cannot loop.
+
+The settle trigger has two subtriggers:
+
+- the creative-mode gate, negated for the normal settle and positive for the creative one;
+- the same "not the custom session" condition (`ConditionActiveSession` + `SessionBlacklist 1`).
+
+The second guard means a pending cue can never run a restore script inside the custom session. It fires on the next session entry instead.
+
 ## 6. The hide script
 
-`hide.lua` runs while the player is in the custom session. It does four things:
+`hide.lua` runs while the player is in the custom session. It:
 
-1. Force-unlock the street buildings. This is a safety net; the generator already keeps them out of the item list.
-2. For every item in the list, call `ts.Unlock.SetRelockNet(guid)`.
-3. Delete the restore marker.
-4. Return.
+1. Force-unlocks the street buildings. This is a safety net; the generator already keeps them out of the item list.
+2. Calls `ts.Unlock.SetRelockNet(guid)` for every item in the list.
+3. Removes both the normal and the creative restore marker, so the next departure restores again.
+4. Writes one runtime log line (`branch=hide`, with the item and failure counts).
+5. Returns.
+
+Every item call is wrapped in `pcall`. A failed relock is counted, logged and retried on the next 2 second re-fire; it never stops the remaining items.
 
 `SetRelockNet` changes the game's real unlock state for the player, not a cosmetic UI flag. The `Net` suffix refers to the game's authoritative state. After every item in a tab is locked, the tab has nothing available and the game stops drawing it.
 
@@ -146,40 +166,87 @@ An early version used the `SessionEnter` event. That event fires once, so it nev
 `show.lua` runs in every session except the custom one. It does not unlock everything. It asks the game to apply its own unlock rules again.
 
 1. Force-unlock the streets.
-2. If the marker file exists, return. This makes the restore one-shot per visit.
-3. For each item, call `ts.ToolOneDataHelper.GetUnlockTriggerForAsset(guid)`. The answer is the GUID of the trigger that normally grants the item.
-4. Collect the distinct trigger GUIDs in a table.
-5. For each trigger, call `ts.Conditions.RegisterTriggerForCurrentParticipant(trigger)`. The game then applies that rule to the player again and unlocks only what the player qualifies for.
-6. Items that have no trigger are unlocked directly with `ts.Unlock.SetUnlockNet(guid)`.
-7. Write the marker file.
+2. Read the active session. If it is the custom session, relock the items, clear both markers, log `branch=hide` and return. This is a second line of defence: the trigger condition should already be false there.
+3. If a valid marker exists, log `branch=settle` and return. This makes the restore one-shot per visit and absorbs the 500 ms arrival cue.
+4. For each item, call `ts.ToolOneDataHelper.GetUnlockTriggerForAsset(guid)`. The answer is the GUID of the trigger that normally grants the item.
+5. Collect the distinct trigger GUIDs and call `ts.Conditions.RegisterTriggerForCurrentParticipant(trigger)` for each. Record whether each registration succeeded.
+6. Visit every item again:
+   - if the lookup raised an error, count a failure and **never** fall through to a direct unlock;
+   - if the item has a trigger, count success only when that trigger was registered by this run;
+   - if the item has no trigger, unlock it directly with `ts.Unlock.SetUnlockNet(guid)`.
+7. Write the marker only when every item succeeded.
+8. Log `branch=restore` with `via=named` or `via=generic`, the item count, the success count and the failure count.
 
 The difference from a snapshot restore matters. Reading `GetIsUnlocked` reports the game's default state, not what the player earned. A snapshot restore gave a fresh save most of the menu. Re-registering the triggers restores the rules, so progression decides the result.
 
-The Lua wraps each call in `pcall`. If one call fails, the loop continues and the rest of the menu is still handled.
+The Lua wraps each call in `pcall`. A failed lookup is a failure, not an excuse to grant the item. A partial restore writes no marker, so the next visit retries it.
 
 ## 8. The creative script
 
 Creative mode has no progression. The game also turns off progression triggers there, so re-registering them does nothing. `creative.lua` handles that case:
 
 1. Force-unlock the streets.
-2. For every item, call `ts.Unlock.SetUnlockNet(guid)`.
+2. Read the active session. Inside the custom session it relocks the items, removes the creative marker and returns.
+3. If a valid creative marker exists, return. This makes the creative restore one-shot per visit; without it the trigger would re-issue every direct unlock every 2 seconds.
+4. Otherwise unlock every item directly with `ts.Unlock.SetUnlockNet(guid)`.
+5. Write the creative marker only when every item succeeded, and log `branch=creative`.
 
 There is nothing to cheat in creative, so direct unlock is correct.
 
-The show trigger and the creative trigger are separated by a `SubTriggers` block with `ConditionIsCreativeMode`:
+The normal and creative restore triggers are separated by a `SubTriggers` block with `ConditionIsCreativeMode`:
 
-- The show trigger negates the condition, so it runs outside creative.
+- The normal trigger negates the condition, so it runs outside creative.
 - The creative trigger requires the condition, so it runs only in creative.
 
-## 9. The marker file
+The generic restore and the settle trigger each have a creative twin for the same reason.
 
-The marker path is `logs/<prefix>_<module>.restore`, relative to the game's working folder.
+## 9. Markers and the runtime log
 
-- The show script writes it after a restore.
-- The show script returns early if it already exists.
-- The hide script deletes it.
+### Markers
 
-The cycle is: leave the custom session, restore once, mark it; enter the custom session, hide and clear the mark; leave again, restore again. Without the marker, the show trigger would re-register every trigger every 2 seconds.
+The marker paths are `logs/<prefix>_<module>.restore` (normal) and `logs/<prefix>_<module>.restore_creative` (creative), relative to the game's working folder.
+
+A marker is written in the v2 format:
+
+```
+v2|<ident>|<item count>|<os.time>
+```
+
+- It is written only when **every** item succeeded. A partial restore leaves no marker, so the next visit retries.
+- A marker is accepted only when its signature (`<ident>|<item count>`) matches the running script and it is younger than `marker_max_age_seconds` (default 6 hours, 21600).
+- Empty, garbled, foreign and stale markers are treated as absent.
+- The hide script removes both markers. If a removal fails, it logs the failure and overwrites the marker with an invalidated stamp (`invalidated|0`), so a marker that survives a failed removal can never latch a restore off forever.
+
+The cycle is: leave the custom session, restore once, mark it; enter the custom session, hide and clear the marks; leave again, restore again. Without the marker, the restore trigger would re-register every trigger every 2 seconds.
+
+### The runtime log
+
+Every generated script writes one line per state change to `logs/<prefix>.log` next to the game's other logs. Rotation keeps one backup:
+
+| File | Purpose |
+|---|---|
+| `logs/<prefix>.log` | The live log. |
+| `logs/<prefix>.prev.log` | The previous log, after rotation at `log_rotate_bytes` (default 256 KB). |
+| `logs/<prefix>.cursor` | Per-key dedupe state, rewritten through a temp file and renamed into place. |
+| `logs/menugate_debug.off` | Create this file to silence the log. |
+
+The log rotates by renaming the live file over the backup; if the backup cannot be replaced it is removed and the rename retried. The cursor keeps one line per distinct key, so two modules alternating every 2 seconds do not overwrite each other's dedupe state.
+
+An identical line is skipped inside `log_dedupe_seconds` (default 60). The dedupe key is:
+
+```
+<ident>|<session>|<branch>|<marker>|failed=<n>
+```
+
+The failed count is part of the key, so a successful hide never masks a failed one. With no clock, dedupe is skipped entirely and every state change is written.
+
+The line format is:
+
+```
+<UTC stamp> | <ident> | session=<guid>(<name>) | [region=<guid>(<name)> |] branch=<hide|restore|creative|settle> | via=<hide|named|generic|settle> | marker=<present|absent|none> | items=<n> | ok=<n> | failed=<n> [| fail=<guid>:<error> ...]
+```
+
+The `region=` field appears only when `known_sessions` gives that session a region. At most five failures are printed; more are replaced by `...`. Every `io` and `os` call runs inside `pcall(function() ... end)`, so a missing file API cannot break the gate. Logging is display only: it never changes an unlock.
 
 ## 10. Streets
 
@@ -199,7 +266,14 @@ A module is one item list with its own Lua files and triggers. The core module c
 
 Modules are independent by design. The core module does not change when a compatibility module is added, and a problem in one module does not stop the others.
 
-Trigger GUIDs are allocated in order from `trigger_guid_base`. Each module uses one hide GUID, one show GUID per other session, and one creative GUID per other session. With five vanilla sessions, one module uses eleven GUIDs.
+Trigger GUIDs are allocated in order from `trigger_guid_base`. Each module uses, with `N` show sessions:
+
+- 1 hide trigger;
+- `N` named restore triggers and `N` named creative triggers;
+- 1 generic restore trigger and 1 generic creative trigger;
+- 1 settle flag, 1 settle trigger and 1 creative settle trigger.
+
+That is `2N + 6` with creative restore on, or `N + 4` with it off. With the default five show sessions, one module uses **16** GUIDs (9 without creative). Two modules use 32 (18 without creative). The New World demo has four show sessions, so it uses 14 (8 without creative).
 
 ## 12. Mod-added items
 
@@ -223,9 +297,9 @@ The scanner is experimental. It understands the common ModOp forms and warns whe
 
 ## 13. Loading and saving
 
-The trigger is registered when the save loads. The session condition is checked every 2 seconds, so the state settles whichever session the save opens into.
+The trigger is registered when the save loads. The session condition is checked every 2 seconds, so the state settles whichever session the save opens into. The generic trigger and the 500 ms arrival cue cover a load into a session the preset list does not name.
 
-The hide script and the show script are idempotent. Running the hide twice locks the same items twice. Running the show twice returns at the marker. A crash or a reload does not leave the menu in a half state that cannot recover.
+The hide script and the show script are idempotent. Running the hide twice locks the same items twice. Running the show twice returns at the marker. A partial restore writes no marker and is retried. A crash or a reload does not leave the menu in a half state that cannot recover.
 
 ## 14. What the gate does not do
 
@@ -234,6 +308,7 @@ The hide script and the show script are idempotent. Running the hide twice locks
 - It does not change products, needs, or buildings.
 - It does not use a snapshot restore.
 - It does not read `mod-loader.log`.
+- It does not coordinate two players in different sessions. In co-op, a partner inside the custom session wants the tabs locked while a partner outside it wants them unlocked. The `Net` calls change one shared unlock state, so the last writer wins. Multiplayer is accepted as a known limitation and is not fixed.
 
 ## 15. What is tested and what is not
 
@@ -247,6 +322,6 @@ Not tested in game yet:
 
 - The Old World, Arctic, and Enbesa presets.
 - The scanner against a wide range of published mods.
-- Multiplayer. The `Net` calls suggest the state is shared, but this project has not checked how another player's menu behaves.
+- Multiplayer and co-op. The `Net` calls change a shared unlock state, so partners in different sessions request opposite lock states and the last writer wins. This is a known limitation, accepted rather than fixed.
 
 The local test suite checks XML shape, Lua syntax, item counts, generator determinism, preset data, scanner behaviour on fixture mods, and repository hygiene. It cannot check what the game does. An in-game report is the only proof for a new region.
